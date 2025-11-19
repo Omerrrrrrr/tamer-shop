@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>İletişim | Telefon Aksesuarları</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-gray-100">
+    <%- include('partials/header') %>
+
+    <main class="max-w-3xl mx-auto py-10 px-4">
+      <h1 class="text-2xl font-bold mb-4">İletişim</h1>
+      <p class="text-gray-700 mb-4">
+        Buraya telefon, e-posta, adres gibi bilgileri sonra ekleyebilirsin.
+      </p>
+
+      <form class="bg-white shadow rounded p-4 grid gap-3">
+        <input type="text" placeholder="Adınız" class="border rounded px-3 py-2 text-sm" />
+        <input type="email" placeholder="E-posta" class="border rounded px-3 py-2 text-sm" />
+        <textarea placeholder="Mesajınız" rows="4" class="border rounded px-3 py-2 text-sm"></textarea>
+        <button class="bg-indigo-600 text-white text-sm py-2 rounded hover:bg-indigo-700">
+          Gönder
+        </button>
+      </form>
+    </main>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

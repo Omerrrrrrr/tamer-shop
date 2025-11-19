@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ürünler | Telefon Aksesuarları</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-gray-100">
+    <%- include('partials/header') %>
+
+    <main class="max-w-6xl mx-auto py-10 px-4">
+      <h1 class="text-2xl font-bold mb-6">Tüm Ürünler</h1>
+
+      <!-- Kategori filtresi -->
+      <div class="flex flex-wrap gap-2 mb-8">
+        <% categories.forEach(cat => { %>
+          <a
+            href="/products?<%= cat.id === 'all' ? '' : 'cat=' + cat.id %>"
+            class="px-4 py-2 rounded-full text-sm border
+                   <%= activeCategory === cat.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 hover:bg-gray-100' %>">
+            <%= cat.label %>
+          </a>
+        <% }) %>
+      </div>
+
+      <!-- Ürün grid -->
+      <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <% products.forEach(product => { %>
+          <article class="bg-white rounded-lg shadow p-4 flex flex-col">
+            <div class="bg-gray-200 rounded mb-3 aspect-[4/3]"></div>
+            <h2 class="font-semibold mb-1"><%= product.name %></h2>
+            <p class="text-sm text-gray-500 mb-3"><%= product.desc %></p>
+            <button
+              class="mt-auto bg-indigo-600 text-white text-sm py-2 rounded hover:bg-indigo-700">
+              Sepete Ekle
+            </button>
+          </article>
+        <% }) %>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

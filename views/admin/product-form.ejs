@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Yeni Ürün | Admin Panel</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-gray-100">
+    <header class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
+      <h1 class="font-bold text-lg">🔐 Admin Panel — Yeni Ürün</h1>
+      <div class="flex items-center gap-4 text-sm">
+        <a href="/admin/products" class="hover:underline">Ürünlere Dön</a>
+        <a href="/admin/logout" class="bg-red-500 px-3 py-1 rounded hover:bg-red-600">
+          Çıkış Yap
+        </a>
+      </div>
+    </header>
+
+    <main class="max-w-xl mx-auto py-8 px-4">
+      <h2 class="text-xl font-semibold mb-4">Yeni Ürün Ekle</h2>
+
+      <% if (error) { %>
+        <p class="mb-4 text-sm text-red-600"><%= error %></p>
+      <% } %>
+
+      <form method="POST" action="/admin/products" class="bg-white shadow rounded p-4 grid gap-4">
+        <div>
+          <label class="block text-sm mb-1">Ürün Adı *</label>
+          <input
+            type="text"
+            name="name"
+            class="w-full border rounded px-3 py-2 text-sm"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm mb-1">Açıklama</label>
+          <textarea
+            name="desc"
+            rows="3"
+            class="w-full border rounded px-3 py-2 text-sm"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm mb-1">Kategori *</label>
+          <select
+            name="category"
+            class="w-full border rounded px-3 py-2 text-sm"
+            required>
+            <option value="">Seçiniz</option>
+            <% categories.forEach(cat => { if (cat.id !== 'all') { %>
+              <option value="<%= cat.id %>"><%= cat.label %></option>
+            <% }}); %>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          class="bg-indigo-600 text-white text-sm py-2 rounded hover:bg-indigo-700">
+          Kaydet
+        </button>
+      </form>
+    </main>
+  </body>
+</html>

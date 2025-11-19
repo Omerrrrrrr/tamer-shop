@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Panel | Telefon Aksesuarları</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-gray-100">
+    <header class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
+      <h1 class="font-bold text-lg">🔐 Admin Panel</h1>
+      <div class="flex items-center gap-4 text-sm">
+        <a href="/" class="hover:underline">Siteye Git</a>
+        <a href="/admin/logout" class="bg-red-500 px-3 py-1 rounded hover:bg-red-600">
+          Çıkış Yap
+        </a>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-8 px-4 grid gap-8">
+      <section>
+        <h2 class="text-xl font-semibold mb-3">Özet</h2>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div class="bg-white shadow rounded p-4">
+            <p class="text-sm text-gray-500">Toplam Ürün</p>
+            <p class="text-2xl font-bold"><%= products.length %></p>
+          </div>
+          <div class="bg-white shadow rounded p-4">
+            <p class="text-sm text-gray-500">Kategori Sayısı</p>
+            <p class="text-2xl font-bold"><%= categories.length %></p>
+          </div>
+          <div class="bg-white shadow rounded p-4">
+            <p class="text-sm text-gray-500">Panel Durumu</p>
+            <p class="text-2xl font-bold text-green-600">Aktif</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xl font-semibold">Ürünler</h2>
+          <a
+            href="/admin/products"
+            class="text-sm bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">
+            Ürünleri Yönet
+          </a>
+        </div>
+        <table class="w-full text-sm bg-white shadow rounded overflow-hidden">
+          <thead class="bg-gray-100 text-left">
+            <tr>
+              <th class="px-4 py-2">ID</th>
+              <th class="px-4 py-2">İsim</th>
+              <th class="px-4 py-2">Kategori</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach(p => { %>
+              <tr class="border-t">
+                <td class="px-4 py-2"><%= p.id %></td>
+                <td class="px-4 py-2"><%= p.name %></td>
+                <td class="px-4 py-2"><%= p.category %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

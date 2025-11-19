@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ürün Yönetimi | Admin Panel</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-gray-100">
+    <header class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
+      <h1 class="font-bold text-lg">🔐 Admin Panel — Ürünler</h1>
+      <div class="flex items-center gap-4 text-sm">
+        <a href="/admin" class="hover:underline">Dashboard</a>
+        <a href="/admin/logout" class="bg-red-500 px-3 py-1 rounded hover:bg-red-600">
+          Çıkış Yap
+        </a>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-8 px-4 grid gap-6">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold">Ürün Listesi</h2>
+        <a
+          href="/admin/products/new"
+          class="bg-indigo-600 text-white text-sm px-4 py-2 rounded hover:bg-indigo-700">
+          + Yeni Ürün
+        </a>
+      </div>
+
+      <table class="w-full text-sm bg-white shadow rounded overflow-hidden">
+        <thead class="bg-gray-100 text-left">
+          <tr>
+            <th class="px-4 py-2">ID</th>
+            <th class="px-4 py-2">İsim</th>
+            <th class="px-4 py-2">Kategori</th>
+            <th class="px-4 py-2 text-right">İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% products.forEach(p => { %>
+            <tr class="border-t">
+              <td class="px-4 py-2"><%= p.id %></td>
+              <td class="px-4 py-2"><%= p.name %></td>
+              <td class="px-4 py-2"><%= p.category %></td>
+              <td class="px-4 py-2 text-right">
+                <!-- Edit'i sonra yaparız -->
+                <a
+                  href="/admin/products/delete/<%= p.id %>"
+                  class="text-xs text-red-600 hover:underline"
+                  onclick="return confirm('Bu ürünü silmek istediğine emin misin?')">
+                  Sil
+                </a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </main>
+  </body>
+</html>
