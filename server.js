@@ -1,214 +1,218 @@
 const express = require("express");
 const path = require("path");
-const session = require("express-session"); 
+const session = require("express-session");
+const crypto = require("crypto");
+const fs = require("fs");
+const https = require("https");
+const multer = require("multer");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const cors = require("cors");
+const shopRouter = require("./routes/shop");
+const authRouter = require("./routes/auth");
+const adminRouter = require("./routes/admin");
+const checkoutRouter = require("./routes/checkout");
+
+const {
+  ensureDefaultCategories,
+  getAllCategories,
+} = require("./db");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
+const HTTPS_KEY_PATH = process.env.HTTPS_KEY_PATH;
+const HTTPS_CERT_PATH = process.env.HTTPS_CERT_PATH;
+const HTTPS_ENABLED = process.env.HTTPS_ENABLED === "true";
+const uploadsDir = path.join(__dirname, "public", "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
-// EJS ayarları
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-// Statik dosyalar
-app.use(express.static(path.join(__dirname, "public")));
-
-app.use(express.urlencoded({ extended: true })); // form verisi için
-
+// Security middleware
 app.use(
-  session({
-    secret: "cok-gizli-bir-anahtar", // TODO: .env'ye taşırız sonra
-    resave: false,
-    saveUninitialized: false,
+  helmet({
+    // Safari ile yaşanan CSS yükleme sorunları için CSP şimdilik kapalı.
+    contentSecurityPolicy: false,
+  })
+);
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-/* ---- Fake ürün & kategori verisi ---- */
+const checkoutLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-const categories = [
-  { id: "all", label: "Tümü" },
-  { id: "kilif", label: "Kılıflar" },
-  { id: "cam", label: "Cam Koruyucu" },
-  { id: "sarf", label: "Şarj & Kablo" },
-  { id: "powerbank", label: "Powerbank" },
-];
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    const unique = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const ext = path.extname(file.originalname || ".jpg") || ".jpg";
+    cb(null, `img-${unique}${ext}`);
+  },
+});
 
-let products = [
-  {
-    id: 1,
-    name: "Şeffaf Telefon Kılıfı",
-    desc: "iPhone & Samsung için uyumlu",
-    category: "kilif",
-  },
-  {
-    id: 2,
-    name: "Renkli Silikon Kılıf",
-    desc: "12 farklı renk seçeneği",
-    category: "kilif",
-  },
-  {
-    id: 3,
-    name: "Cam Ekran Koruyucu",
-    desc: "9H sertlik, tam koruma",
-    category: "cam",
-  },
-  {
-    id: 4,
-    name: "Privacy Cam Koruyucu",
-    desc: "Yandan görünmeyi engeller",
-    category: "cam",
-  },
-  {
-    id: 5,
-    name: "Hızlı Şarj Adaptörü",
-    desc: "20W PD hızlı şarj destekli",
-    category: "sarf",
-  },
-  {
-    id: 6,
-    name: "Type-C Şarj Kablosu",
-    desc: "1.5m, örgü kablo",
-    category: "sarf",
-  },
-  {
-    id: 7,
-    name: "Magsafe Powerbank",
-    desc: "5000 mAh kablosuz şarj",
-    category: "powerbank",
-  },
-  {
-    id: 8,
-    name: "Slim Powerbank",
-    desc: "10000 mAh, ultra ince gövde",
-    category: "powerbank",
-  },
-];
-
-/* ---- ROUTE'lar ---- */
-
-// Basit admin kullanıcı (ileride DB'den gelecek)
-const ADMIN_USER = {
-  username: "admin",
-  password: "admin123", // şimdilik plain, sonra hash + DB yaparız
-};
-
-// Admin koruma middleware'i
-function requireAdmin(req, res, next) {
-  if (req.session && req.session.isAdmin) {
-    return next();
-  }
-  return res.redirect("/admin/login");
+function isSafeImage(file) {
+  return (
+    file &&
+    /^image\//.test(file.mimetype || "") &&
+    /\.(png|jpe?g|gif|webp)$/i.test(file.originalname || "")
+  );
 }
 
-// Ürün listesi (admin)
-app.get("/admin/products", requireAdmin, (req, res) => {
-  res.render("admin/products", { products, categories });
+// Basit magic-number kontrolü (opsiyonel AV için hook)
+function hasValidMagic(buffer) {
+  if (!buffer || buffer.length < 4) return false;
+  const jpg = buffer[0] === 0xff && buffer[1] === 0xd8;
+  const png =
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47;
+  const gif =
+    buffer[0] === 0x47 &&
+    buffer[1] === 0x49 &&
+    buffer[2] === 0x46 &&
+    buffer[3] === 0x38;
+  return jpg || png || gif;
+}
+
+// AV taraması için placeholder (ör: clamav entegrasyonu burada çağrılabilir)
+async function scanFileForMalware() {
+  return true;
+}
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024, files: 5 },
+  fileFilter: (req, file, cb) => {
+    if (!isSafeImage(file)) {
+      return cb(new Error("Sadece görsel dosyaları yükleyebilirsiniz."));
+    }
+    // Magic number check (multer 2 buffer yoksa skip)
+    if (file.buffer && !hasValidMagic(file.buffer)) {
+      return cb(new Error("Geçersiz görsel dosyası."));
+    }
+    return cb(null, true);
+  },
 });
 
-// Yeni ürün formu
-app.get("/admin/products/new", requireAdmin, (req, res) => {
-  res.render("admin/product-form", {
-    categories,
-    error: null,
-  });
+/* ---- Kategoriler ---- */
+const DEFAULT_CATEGORIES = [
+  { id: "kilif", label: "Kılıflar", image_url: "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?auto=format&fit=crop&w=600&q=80" },
+  { id: "cam", label: "Cam Koruyucu", image_url: "https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=600&q=80" },
+  { id: "sarf", label: "Şarj & Kablo", image_url: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80" },
+  { id: "powerbank", label: "Powerbank", image_url: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=600&q=80" },
+  { id: "kulaklik", label: "Kulaklık", image_url: "https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=600&q=80" },
+  { id: "sarjcihazlari", label: "Şarj Cihazları", image_url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=600&q=80" },
+  { id: "kablo", label: "Kablolar", image_url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80" },
+];
+ensureDefaultCategories(DEFAULT_CATEGORIES);
+
+/* ---- View & statik ayarları ---- */
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({ extended: true })); // form verisi için
+app.use("/auth/login", authLimiter);
+app.use("/admin/login", authLimiter);
+app.use("/checkout", checkoutLimiter);
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "cok-gizli-bir-anahtar", // PROD'da .env
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 gün
+    },
+  })
+);
+
+/* ---- Tüm view'lara ortak değişkenler ---- */
+
+app.use((req, res, next) => {
+  const baseCategories = getAllCategories();
+  const categories = [{ id: "all", label: "Tümü" }, ...baseCategories];
+
+  const cart = req.session?.cart || [];
+  const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
+
+  res.locals.cartCount = itemCount;
+  res.locals.searchQuery = (req.query?.q || "").trim();
+  // Oturum açmış alıcı bilgisi
+  res.locals.currentUser = req.session?.user || null;
+  res.locals.isAdmin = !!req.session?.isAdmin;
+  res.locals.categories = categories;
+  res.locals.baseCategories = baseCategories;
+  req.categories = baseCategories;
+
+  next();
 });
 
-// Yeni ürün kaydetme
-app.post("/admin/products", requireAdmin, (req, res) => {
-  const { name, desc, category } = req.body;
+/* ---- ROUTER'LAR ---- */
+app.use("/", shopRouter({ upload }));
+app.use("/", authRouter());
+app.use("/", checkoutRouter());
+app.use("/admin", adminRouter({ upload }));
 
-  if (!name || !category) {
-    return res.render("admin/product-form", {
-      categories,
-      error: "İsim ve kategori zorunludur.",
-    });
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  const isHtml = req.accepts("html");
+  const message =
+    process.env.NODE_ENV === "production"
+      ? "Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+      : err.message || "Beklenmeyen hata";
+
+  if (isHtml) {
+    return res
+      .status(500)
+      .send(
+        `<h1>Hata</h1><p>${message}</p><p>${process.env.NODE_ENV === "production" ? "" : (err.stack || "")}</p>`
+      );
   }
 
-  const newProduct = {
-    id: products.length ? products[products.length - 1].id + 1 : 1,
-    name,
-    desc: desc || "",
-    category,
-  };
-
-  products.push(newProduct);
-  res.redirect("/admin/products");
+  return res.status(500).json({ error: message });
 });
 
-// Ürün silme (çok basit)
-app.get("/admin/products/delete/:id", requireAdmin, (req, res) => {
-  const id = Number(req.params.id);
-  products = products.filter((p) => p.id !== id);
-  res.redirect("/admin/products");
+/* ---- SERVER ---- */
+
+const httpServer = app.listen(PORT, () => {
+  console.log(`🚀 HTTP server: http://localhost:${PORT}`);
 });
 
-// Ana sayfa: öne çıkan ürünler (ilk 4)
-app.get("/", (req, res) => {
-  res.render("index", { products: products.slice(0, 4) });
-});
-
-// Ürünler sayfası + kategori filtresi
-app.get("/products", (req, res) => {
-  const activeCategory = req.query.cat || "all";
-
-  const filteredProducts =
-    activeCategory === "all"
-      ? products
-      : products.filter((p) => p.category === activeCategory);
-
-  res.render("products", {
-    products: filteredProducts,
-    categories,
-    activeCategory,
-  });
-});
-
-// ---- ADMIN ROUTES ----
-
-// Login formu
-app.get("/admin/login", (req, res) => {
-  if (req.session.isAdmin) {
-    return res.redirect("/admin");
+if (HTTPS_ENABLED && HTTPS_KEY_PATH && HTTPS_CERT_PATH) {
+  try {
+    const key = fs.readFileSync(HTTPS_KEY_PATH);
+    const cert = fs.readFileSync(HTTPS_CERT_PATH);
+    https
+      .createServer({ key, cert }, app)
+      .listen(HTTPS_PORT, () => {
+        console.log(`🔒 HTTPS server: https://localhost:${HTTPS_PORT}`);
+      });
+  } catch (err) {
+    console.error("HTTPS başlatılırken hata:", err.message);
   }
-  res.render("admin/login", { error: null });
-});
-
-// Login POST
-app.post("/admin/login", (req, res) => {
-  const { username, password } = req.body;
-
-  if (
-    username === ADMIN_USER.username &&
-    password === ADMIN_USER.password
-  ) {
-    req.session.isAdmin = true;
-    return res.redirect("/admin");
-  }
-
-  res.render("admin/login", { error: "Kullanıcı adı veya şifre hatalı." });
-});
-
-// Logout
-app.get("/admin/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/admin/login");
-  });
-});
-
-// Admin dashboard (korumalı)
-app.get("/admin", requireAdmin, (req, res) => {
-  res.render("admin/dashboard", { products, categories });
-});
-
-// Basit Hakkımızda & İletişim sayfaları (şimdilik)
-app.get("/about", (req, res) => {
-  res.render("about");
-});
-
-app.get("/contact", (req, res) => {
-  res.render("contact");
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server çalışıyor: http://localhost:${PORT}`);
-});
+}

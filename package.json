@@ -5,16 +5,24 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/css/styles.css",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./public/css/styles.css --watch",
+    "test": "node --test",
+    "migrate": "node scripts/migrate.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "better-sqlite3": "^12.4.6",
+    "cors": "^2.8.5",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
-    "express-session": "^1.18.2"
+    "express-rate-limit": "^7.4.0",
+    "express-session": "^1.18.2",
+    "helmet": "^7.1.0",
+    "multer": "^2.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.22",

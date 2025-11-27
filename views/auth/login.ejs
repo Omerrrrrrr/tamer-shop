@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Giriş Yap | Güllüce İletişim</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <%- include('../partials/header') %>
+
+    <main class="max-w-5xl mx-auto px-4 py-10 grid gap-10 lg:grid-cols-[1fr,0.9fr] items-start">
+      <section class="card bg-gradient-to-br from-indigo-600 via-indigo-500 to-cyan-400 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_20%,_white,_transparent_35%)]"></div>
+        <div class="relative z-10 space-y-4">
+          <p class="section-label text-white/80">Giriş</p>
+          <h1 class="text-3xl font-semibold leading-tight">
+            Hoş geldin! Sipariş ve sepet bilgilerine erişmek için giriş yap.
+          </h1>
+          <ul class="space-y-2 text-sm text-white/90">
+            <li class="flex items-center gap-2"><span>✅</span><span>Sepetini cihazlar arasında senkronize et.</span></li>
+            <li class="flex items-center gap-2"><span>✅</span><span>Yeni gelen ürünleri hızlıca kaydet.</span></li>
+            <li class="flex items-center gap-2"><span>✅</span><span>Adres ve sipariş geçmişine tek panelden eriş.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card glass">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <p class="text-xs text-indigo-500 font-semibold uppercase tracking-[0.2em]">Giriş Yap</p>
+            <h2 class="text-xl font-semibold text-slate-900">Hesabına devam et</h2>
+          </div>
+          <a href="/auth/register" class="text-xs text-indigo-600 hover:underline">Hesabın yok mu?</a>
+        </div>
+
+        <% if (error) { %>
+          <p class="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+            <%= error %>
+          </p>
+        <% } %>
+
+        <form action="/auth/login" method="POST" class="space-y-4">
+          <div>
+            <label for="email" class="block text-sm font-medium text-slate-700 mb-1">E-posta</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value="<%= form?.email || '' %>"
+              class="input"
+              placeholder="mail@ornek.com"
+            />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Şifre</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              class="input"
+              placeholder="Şifreniz"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn-primary w-full justify-center">
+            Giriş Yap
+          </button>
+        </form>
+
+        <p class="text-xs text-slate-500 mt-4">
+          Şifreni unuttuysan bizimle iletişime geçebilirsin. Güvenlik için tek cihazdan giriş açık kalır.
+        </p>
+      </section>
+    </main>
+
+    <%- include('../partials/footer') %>
+  </body>
+</html>

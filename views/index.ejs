@@ -5,34 +5,209 @@
     <title>Telefon Aksesuarları</title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
-  <body class="bg-gray-100">
+  <body class="bg-slate-50 text-slate-900">
 
     <%- include('partials/header') %>
 
-    <section class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-20 text-center">
-      <h1 class="text-4xl font-bold mb-4">
-        Toptan Telefon Aksesuarları Mağazası
-      </h1>
-      <p class="text-lg opacity-90">
-        Kılıf, cam koruyucu, şarj cihazı ve daha fazlası için modern, hızlı ve güvenilir altyapı.
-      </p>
+    <%
+      const homeCategories = Array.isArray(categories) ? categories : [];
+      const categoryLabels = {};
+      homeCategories.forEach(cat => {
+        categoryLabels[cat.id] = cat.label;
+      });
+      const featuredCats = homeCategories.filter(cat => cat.id !== "all").slice(0, 3);
+      const fallbackImage = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80";
+    %>
+
+    <section class="gradient-hero border-b border-slate-200/80">
+      <div class="max-w-6xl mx-auto px-4 py-12 grid gap-10 md:grid-cols-[1.1fr,0.9fr] items-center">
+        <div class="space-y-5">
+          <p class="soft-badge">Yeni sezon aksesuar · Hızlı teslimat</p>
+          <h1 class="text-4xl md:text-5xl font-semibold leading-tight text-slate-900">
+            Tarzını yansıtan aksesuarları seç, kapına hızlı gelsin.
+          </h1>
+          <p class="text-sm text-slate-600 max-w-xl">
+            Güncel stok, kaliteli görseller ve tek tıkla sipariş akışı. Kılıf, cam, şarj ve powerbank seçeneklerini kolayca karşılaştır ve sepetine ekle.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="/products" class="btn-primary">Ürünleri Gör</a>
+            <a href="https://wa.me/+905428904151" target="_blank" class="btn-secondary">Satış Ekibi</a>
+          </div>
+          <dl class="grid grid-cols-3 gap-4 text-sm text-slate-600">
+            <div class="card glass">
+              <dt class="text-xs text-slate-500 uppercase">Ürün</dt>
+              <dd class="text-2xl font-semibold text-slate-900"><%= totalProducts %>+</dd>
+            </div>
+            <div class="card glass">
+              <dt class="text-xs text-slate-500 uppercase">Kategori</dt>
+              <dd class="text-2xl font-semibold text-slate-900"><%= totalCategories %></dd>
+            </div>
+            <div class="card glass">
+              <dt class="text-xs text-slate-500 uppercase">Stok</dt>
+              <dd class="text-2xl font-semibold text-slate-900"><%= totalStock %>+</dd>
+            </div>
+          </dl>
+          <div class="flex flex-wrap gap-2 text-xs text-slate-500">
+            <span class="chip">HD ürün görselleri</span>
+            <span class="chip">Hızlı sevkiyat</span>
+            <span class="chip">Kolay iade</span>
+          </div>
+        </div>
+
+        <div class="card glass relative overflow-hidden">
+          <div class="absolute -top-16 -right-10 w-52 h-52 rounded-full bg-indigo-200 blur-3xl opacity-70"></div>
+          <div class="absolute -bottom-12 -left-6 w-48 h-48 rounded-full bg-cyan-200 blur-3xl opacity-70"></div>
+          <div class="relative z-10 space-y-4">
+            <div class="flex items-center justify-between">
+              <p class="section-label text-indigo-500">Öne çıkan kategoriler</p>
+              <span class="text-xs text-slate-500">16:00 öncesi aynı gün hazırlık</span>
+            </div>
+            <div class="grid gap-3">
+              <% featuredCats.forEach(cat => { %>
+                <a
+                  href="<%= '/products?cat=' + cat.id %>"
+                  class="flex items-center justify-between rounded-xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm hover:-translate-y-0.5 hover:border-indigo-100 transition">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 img-frame">
+                      <% if (cat.image_url) { %>
+                        <img src="<%= cat.image_url %>" alt="<%= cat.label %>" class="w-full h-full object-cover" />
+                      <% } else { %>
+                        <div class="w-full h-full flex items-center justify-center text-lg text-slate-400">📦</div>
+                      <% } %>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-slate-900"><%= cat.label %></p>
+                      <p class="text-xs text-slate-500">Mağazada öne çıkar</p>
+                    </div>
+                  </div>
+                  <span class="text-sm text-indigo-600">↗</span>
+                </a>
+              <% }) %>
+            </div>
+            <div class="mt-4 overflow-hidden rounded-xl border border-white/70 shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80"
+                alt="Ürün görsel"
+                class="w-full h-48 object-cover" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="section-label text-indigo-500">Kategoriler</p>
+          <h2 class="text-2xl font-semibold mt-1">İhtiyacını saniyeler içinde bul</h2>
+        </div>
+        <a href="/products" class="text-sm text-indigo-600 hover:underline">Tüm ürünleri gör</a>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <% homeCategories.forEach(cat => { %>
+          <a
+            href="<%= cat.id === 'all' ? '/products' : '/products?cat=' + cat.id %>"
+            class="card glass flex items-center gap-4 hover:-translate-y-1 transition">
+            <div class="w-14 h-14 img-frame">
+              <% if (cat.image_url) { %>
+                <img src="<%= cat.image_url %>" alt="<%= cat.label %>" class="w-full h-full object-cover" />
+              <% } else { %>
+                <div class="w-full h-full flex items-center justify-center text-2xl text-slate-400">📦</div>
+              <% } %>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-900"><%= cat.label %></p>
+              <p class="text-xs text-slate-500">
+                <%= cat.id === 'all' ? 'Tüm katalog' : 'Kategori vitrinine göz at' %>
+              </p>
+            </div>
+          </a>
+        <% }) %>
+      </div>
     </section>
 
     <main class="max-w-6xl mx-auto py-10 px-4">
-      <h2 class="text-xl font-semibold mb-6">Öne Çıkan Ürünler</h2>
-
-        <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            <% products.forEach(product => { %>
-                <article class="bg-white rounded-lg shadow p-4 flex flex-col">
-                <div class="bg-gray-200 rounded mb-3 aspect-[4/3]"></div>
-                <h2 class="font-semibold mb-1"><%= product.name %></h2>
-                <p class="text-sm text-gray-500 mb-3"><%= product.desc %></p>
-                <button class="mt-auto bg-indigo-600 text-white text-sm py-2 rounded hover:bg-indigo-700">
-                    Sepete Ekle
-                </button>
-                </article>
-            <% }) %>
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <p class="text-xs uppercase tracking-[0.3em] text-indigo-500 font-semibold">Seçilenler</p>
+          <h2 class="text-2xl font-semibold">Öne çıkan ürünler</h2>
         </div>
+        <a href="/products" class="text-sm text-gray-600 hover:text-indigo-600 font-medium">
+          Tümünü incele →
+        </a>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <% products.forEach(product => { %>
+          <article class="card flex flex-col hover:-translate-y-1 transition">
+            <div class="img-frame group h-36 text-4xl flex items-center justify-center">
+              <% if ((product.discount_percent || 0) > 0) { %>
+                <span class="absolute top-2 left-2 max-w-[80%] truncate text-[11px] font-semibold text-white bg-rose-600 px-2.5 py-1 rounded-full shadow-xl ring-2 ring-white/70 backdrop-blur-sm" style="text-shadow:0 1px 2px rgba(0,0,0,0.35);">
+                  Fırsat -<%= product.discount_percent %>%
+                </span>
+              <% } %>
+              <% if (product.image_url) { %>
+                <img
+                  src="<%= product.image_url %>"
+                  alt="<%= product.name %>"
+                  class="w-full h-full object-cover" />
+              <% } else { %>
+                <div class="w-full h-full flex items-center justify-center text-4xl text-slate-400">
+                  📦
+                </div>
+              <% } %>
+            </div>
+            <p class="text-xs text-slate-500 mt-3">
+              <%= categoryLabels[product.category] || 'Ürün' %>
+            </p>
+            <h3 class="text-lg font-semibold mt-1">
+              <a href="/products/<%= product.id %>" class="hover:text-indigo-600">
+                <%= product.name %>
+              </a>
+            </h3>
+            <p class="text-sm text-gray-500 mt-1 flex-1">
+              <%= product.description %>
+            </p>
+
+            <p class="text-sm font-semibold text-slate-900 mt-2 mb-3 flex items-center gap-2">
+              <% if ((product.discount_percent || 0) > 0) { %>
+                <span class="text-[11px] text-white font-semibold bg-rose-600 px-2.5 py-1 rounded-full shadow-lg ring-1 ring-white/60 backdrop-blur-sm max-w-[70%] truncate" style="text-shadow:0 1px 2px rgba(0,0,0,0.35);">
+                  Fırsat -<%= product.discount_percent %>%
+                </span>
+                <span class="line-through text-slate-400 text-xs">
+                  ₺<%= Number(product.price || 0).toFixed(2) %>
+                </span>
+                <span class="px-2 py-1 rounded-lg bg-slate-900 text-white shadow">
+                  ₺<%= Number(product.salePrice || product.price || 0).toFixed(2) %>
+                </span>
+              <% } else { %>
+                ₺<%= Number(product.price || 0).toFixed(2) %>
+              <% } %>
+            </p>
+
+            <div class="flex gap-2 mt-auto">
+              <% if (Number(product.stock || 0) > 0 && Number(product.price || 0) > 0) { %>
+                <a
+                  href="/cart/add/<%= product.id %>"
+                  class="flex-1 text-center bg-indigo-600 text-white text-sm font-medium py-2 rounded-xl hover:bg-indigo-700 transition">
+                  Sepete Ekle
+                </a>
+              <% } else { %>
+                <button
+                  class="flex-1 text-center bg-slate-200 text-slate-500 text-sm font-medium py-2 rounded-xl cursor-not-allowed"
+                  disabled>
+                  Stokta Yok
+                </button>
+              <% } %>
+              <a
+                href="<%= product.category === 'all' ? '/products' : '/products?cat=' + product.category %>"
+                class="px-4 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 hover:border-indigo-200">
+                Kategori
+              </a>
+            </div>
+          </article>
+        <% }) %>
+      </div>
     </main>
 
     <%- include('partials/footer') %>

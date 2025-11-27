@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sepet | Telefon Aksesuarları</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+
+    <%- include('partials/header') %>
+
+    <section class="gradient-hero border-y border-slate-200/80">
+      <div class="max-w-4xl mx-auto px-4 py-8 space-y-3">
+        <p class="soft-badge">Sepet</p>
+        <h1 class="text-3xl font-semibold">Siparişe hazır ürünlerin</h1>
+        <p class="text-sm text-slate-600 max-w-2xl">
+          Ürünleri düzenleyebilir ve alışverişe devam edebilirsin. Görseller yüksek çözünürlükte saklanır.
+        </p>
+      </div>
+    </section>
+
+    <main class="max-w-4xl mx-auto px-4 pb-16">
+      <% 
+        const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+        const totalAmount = cart.reduce((sum, item) => {
+          const price = Number(item.price || 0);
+          return sum + price * item.qty;
+        }, 0);
+      %>
+
+      <% if (cart.length === 0) { %>
+        <div class="card glass text-center">
+          <p class="text-lg font-semibold text-slate-800 mb-3">Sepetin boş</p>
+          <p class="text-sm text-slate-500 mb-6">
+            Ürünleri eklemek için katalogdan favorilerini seçebilir veya trend listemize göz atabilirsin.
+          </p>
+          <a
+            href="/products"
+            class="btn-primary">
+            Ürünlere Git
+          </a>
+        </div>
+      <% } else { %>
+        <div class="grid gap-6 lg:grid-cols-[2fr,1fr]">
+          <div class="space-y-4">
+            <% cart.forEach(item => { %>
+              <div class="card glass flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="img-frame w-16 h-16 flex items-center justify-center">
+                    <a href="/products/<%= item.id %>" aria-label="<%= item.name %>">
+                      <% if (item.image_url) { %>
+                        <img src="<%= item.image_url %>" alt="<%= item.name %>" class="w-full h-full object-cover">
+                      <% } else { %>
+                        <span class="text-xl">📦</span>
+                      <% } %>
+                    </a>
+                  </div>
+                  <div>
+                  <p class="text-base font-semibold"><a href="/products/<%= item.id %>" class="hover:text-indigo-600"><%= item.name %></a></p>
+                  <p class="text-xs text-slate-500 mt-1">
+                    Adet: <%= item.qty %>
+                  </p>
+                  <% if ((item.discountPercent || 0) > 0 && item.originalPrice) { %>
+                    <div class="text-xs text-slate-500 mt-1">
+                      <span class="line-through text-slate-400">₺<%= Number(item.originalPrice || 0).toFixed(2) %></span>
+                      <span class="ml-2 font-semibold text-emerald-600">İndirimli birim: ₺<%= Number(item.price || 0).toFixed(2) %> (-<%= item.discountPercent %>%)</span>
+                    </div>
+                    <% } else { %>
+                    <p class="text-xs text-slate-500 mt-1">Birim fiyat: ₺<%= Number(item.price || 0).toFixed(2) %></p>
+                    <% } %>
+                  <p class="text-xs text-slate-700 mt-1 font-semibold">
+                    Toplam (indirimli): ₺<%= (Number(item.price || 0) * item.qty).toFixed(2) %>
+                  </p>
+                </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <form action="/cart/update/<%= item.id %>" method="POST" class="flex items-center gap-2" oninput="this.submit()">
+                    <label for="qty-<%= item.id %>" class="sr-only">Adet</label>
+                    <input
+                      id="qty-<%= item.id %>"
+                      name="qty"
+                      type="number"
+                      min="0"
+                      value="<%= item.qty %>"
+                      class="w-16 rounded-lg border border-slate-200 px-2 py-1 text-sm"
+                    />
+                    <button type="submit" class="text-xs text-indigo-600 font-semibold hover:underline">Güncelle</button>
+                  </form>
+                  <a
+                    href="/cart/remove/<%= item.id %>"
+                    class="text-xs text-rose-600 hover:underline">
+                    Kaldır
+                  </a>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <div class="card glass h-fit">
+            <p class="section-label text-slate-500 mb-3">Özet</p>
+
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-slate-500">Toplam ürün</span>
+              <span class="text-base font-semibold"><%= totalItems %></span>
+            </div>
+
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm text-slate-500">Toplam tutar</span>
+              <span class="text-base font-semibold">
+                ₺<%= totalAmount.toFixed(2) %>
+              </span>
+            </div>
+
+            <p class="text-xs text-slate-400 mb-6">
+              Fiyatlar bilgilendirme amaçlıdır, nihai koşullar satış temsilcisi ile netleşir.
+            </p>
+
+            <div class="flex flex-col gap-2">
+              <a
+                href="/checkout"
+                class="btn-primary w-full justify-center">
+                Kartla Öde
+              </a>
+              <a
+                href="/products"
+                class="btn-secondary w-full justify-center">
+                Alışverişe Devam Et
+              </a>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </main>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

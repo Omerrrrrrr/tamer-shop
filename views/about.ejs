@@ -5,15 +5,64 @@
     <title>Hakkımızda | Telefon Aksesuarları</title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
-  <body class="bg-gray-100">
+  <body class="bg-slate-50 text-slate-900">
     <%- include('partials/header') %>
 
-    <main class="max-w-3xl mx-auto py-10 px-4">
-      <h1 class="text-2xl font-bold mb-4">Hakkımızda</h1>
-      <p class="text-gray-700">
-        Buraya firma bilgilerini, misyon / vizyon gibi metinleri daha sonra ekleyebilirsin.
-        Şimdilik sadece sayfa iskeleti hazır.
-      </p>
+    <section class="gradient-hero border-y border-slate-200/80">
+      <div class="max-w-5xl mx-auto px-4 py-10 grid gap-8 lg:grid-cols-[1.1fr,0.9fr] items-center">
+        <div class="space-y-3">
+          <p class="soft-badge">Hakkımızda</p>
+          <h1 class="text-3xl font-semibold">Mağazalara güç veren tedarik modeli</h1>
+          <p class="text-sm text-slate-600 max-w-3xl">
+            Türkiye'deki kullanıcıların günlük yaşamına uyumlu, şık ve dayanıklı aksesuarları hızlı kargo ile ulaştırmak için yola çıktık.
+          </p>
+          <div class="flex gap-2">
+            <span class="chip">Ulusal lojistik</span>
+            <span class="chip">HD ürün görselleri</span>
+          </div>
+        </div>
+        <div class="card glass overflow-hidden">
+          <img
+            src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1000&q=80"
+            alt="Depo görseli"
+            class="w-full h-64 object-cover" />
+        </div>
+      </div>
+    </section>
+
+    <main class="max-w-5xl mx-auto py-12 px-4 space-y-6">
+      <article class="card glass">
+        <h2 class="text-xl font-semibold mb-2">Misyonumuz</h2>
+        <p class="text-sm text-slate-600">
+          En güncel telefon aksesuarlarını herkesle buluşturmak, sipariş sürecini basitleştirmek ve
+          hızlı teslimat sağlamak için dijital çözümler geliştiriyoruz.
+        </p>
+      </article>
+
+      <article class="card glass">
+        <h2 class="text-xl font-semibold mb-2">Vizyonumuz</h2>
+        <p class="text-sm text-slate-600">
+          Tüm aksesuar ekosistemine tek merkezden ulaşabileceğin, gerçek zamanlı stok bilgisi ve şeffaf fiyatlarla güvenilir bir alışveriş deneyimi sunmak.
+        </p>
+      </article>
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="card glass">
+          <p class="text-lg">⚡</p>
+          <h3 class="font-semibold text-slate-900 mt-2">Hızlı teslimat</h3>
+          <p class="text-sm text-slate-600">16:00'a kadar verilen siparişler aynı gün hazırlanır.</p>
+        </div>
+        <div class="card glass">
+          <p class="text-lg">🖼️</p>
+          <h3 class="font-semibold text-slate-900 mt-2">Kaliteli görseller</h3>
+          <p class="text-sm text-slate-600">Ürünleri vitrinde öne çıkaran HD kütüphane.</p>
+        </div>
+        <div class="card glass">
+          <p class="text-lg">🤝</p>
+          <h3 class="font-semibold text-slate-900 mt-2">Saha desteği</h3>
+          <p class="text-sm text-slate-600">Destek ekibimiz sipariş öncesi ve sonrası yanında.</p>
+        </div>
+      </div>
     </main>
 
     <%- include('partials/footer') %>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Alıcı Kaydı | Güllüce İletişim</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <%- include('../partials/header') %>
+
+    <main class="max-w-5xl mx-auto px-4 py-10 grid gap-10 lg:grid-cols-2 items-start">
+      <section class="card glass relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-indigo-100 blur-3xl"></div>
+        <div class="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-cyan-100 blur-3xl"></div>
+
+        <p class="section-label text-indigo-500 mb-2">Yeni hesap</p>
+        <h1 class="text-3xl font-semibold text-slate-900 mb-3">
+          Alıcı olarak kayıt ol
+        </h1>
+        <p class="text-sm text-slate-600 max-w-xl">
+          Siparişlerini takip etmek, sepetini saklamak ve kampanyalardan haberdar olmak için ücretsiz hesap oluştur.
+        </p>
+
+        <dl class="grid grid-cols-2 gap-4 mt-8 text-sm text-slate-600">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">🔒</div>
+            <div>
+              <p class="font-semibold text-slate-900">Güvenli giriş</p>
+              <p class="text-xs text-slate-500">Şifrelerin şifrelenmiş olarak saklanır.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">⚡</div>
+            <div>
+              <p class="font-semibold text-slate-900">Hızlı sepet</p>
+              <p class="text-xs text-slate-500">Favori ürünlerini kaybetmeden devam et.</p>
+            </div>
+          </div>
+        </dl>
+      </section>
+
+      <section class="card glass">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <p class="text-xs text-indigo-500 font-semibold uppercase tracking-[0.2em]">Kayıt</p>
+            <h2 class="text-xl font-semibold text-slate-900">Bilgilerini doldur</h2>
+          </div>
+          <a href="/auth/login" class="text-xs text-indigo-600 hover:underline">Zaten hesabım var</a>
+        </div>
+
+        <% if (error) { %>
+          <p class="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+            <%= error %>
+          </p>
+        <% } %>
+
+        <form action="/auth/register" method="POST" class="space-y-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Ad Soyad</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              required
+              value="<%= form?.name || '' %>"
+              class="input"
+              placeholder="Ör: Ahmet Yılmaz"
+            />
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-slate-700 mb-1">E-posta</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value="<%= form?.email || '' %>"
+              class="input"
+              placeholder="mail@ornek.com"
+            />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Şifre</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              minlength="6"
+              required
+              class="input"
+              placeholder="En az 6 karakter"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn-primary w-full justify-center">
+            Kayıt Ol ve Devam Et
+          </button>
+        </form>
+
+        <p class="text-xs text-slate-500 mt-4">
+          Giriş yaparak kullanım koşullarını kabul etmiş olursun. Dilediğin zaman hesabını silebilirsin.
+        </p>
+      </section>
+    </main>
+
+    <%- include('../partials/footer') %>
+  </body>
+</html>

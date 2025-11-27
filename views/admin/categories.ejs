@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kategoriler | Admin</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <%- include('../partials/header') %>
+
+    <main class="max-w-5xl mx-auto px-4 py-10 space-y-8">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <p class="soft-badge">Admin</p>
+          <h1 class="text-2xl font-semibold mt-2">Kategoriler</h1>
+          <p class="text-sm text-slate-500 mt-1">Yeni kategori ekleyebilir, boş olanları silebilirsin.</p>
+        </div>
+        <a href="/admin/products" class="btn-secondary">Ürünlere dön</a>
+      </div>
+
+      <section class="card glass">
+        <h2 class="text-lg font-semibold mb-4">Yeni kategori ekle</h2>
+
+        <% if (error) { %>
+          <p class="mb-3 text-sm text-rose-600 bg-rose-50 border border-rose-100 rounded-lg px-3 py-2">
+            <%= error %>
+          </p>
+        <% } %>
+        <% if (success) { %>
+          <p class="mb-3 text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+            <%= success %>
+          </p>
+        <% } %>
+
+        <form action="/admin/categories" method="POST" class="grid gap-4 md:grid-cols-[1.2fr,1fr]">
+          <div>
+            <label class="block text-sm text-slate-700 mb-1">Kategori Adı *</label>
+            <input
+              type="text"
+              name="label"
+              class="input"
+              placeholder="Örn: MagSafe Aksesuarları"
+              required
+            />
+          </div>
+          <div>
+            <label class="block text-sm text-slate-700 mb-1">Görsel URL (opsiyonel)</label>
+            <input
+              type="url"
+              name="imageUrl"
+              class="input"
+              placeholder="https://..."
+            />
+          </div>
+          <div>
+            <label class="block text-sm text-slate-700 mb-1">Kategori ID (opsiyonel)</label>
+            <input
+              type="text"
+              name="slug"
+              class="input"
+              placeholder="magsafe-aksesuar"
+            />
+            <p class="text-[11px] text-slate-400 mt-1">Boş bırakırsan otomatik oluşturulur.</p>
+          </div>
+          <div class="md:col-span-2">
+            <button type="submit" class="btn-primary">Kategori Ekle</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card glass">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold">Kategori Listesi</h2>
+          <span class="text-xs text-slate-400"><%= categories.length %> kategori</span>
+        </div>
+        <% if (categories.length === 0) { %>
+          <p class="text-sm text-slate-500">Henüz kategori yok, yukarıdan ekleyebilirsin.</p>
+        <% } else { %>
+          <div class="grid gap-2">
+            <% categories.forEach(cat => { %>
+              <div class="flex items-center justify-between rounded-xl border border-slate-100 px-4 py-3 bg-white">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden flex items-center justify-center">
+                    <% if (cat.image_url) { %>
+                      <img src="<%= cat.image_url %>" alt="<%= cat.label %>" class="w-full h-full object-cover" />
+                    <% } else { %>
+                      <span class="text-lg">📦</span>
+                    <% } %>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-900"><%= cat.label %></p>
+                    <p class="text-xs text-slate-500">ID: <%= cat.id %></p>
+                  </div>
+                </div>
+                <a
+                  href="/admin/categories/delete/<%= cat.id %>"
+                  class="text-xs text-rose-600 hover:underline"
+                  onclick="return confirm('Bu kategoriyi silmek istediğine emin misin?');">
+                  Sil
+                </a>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </section>
+    </main>
+    <%- include('../partials/footer') %>
+  </body>
+</html>

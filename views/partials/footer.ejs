@@ -1,6 +1,26 @@
-<footer class="bg-gray-800 text-gray-300 text-center py-6 mt-10 text-sm">
-  © <%= new Date().getFullYear() %> Telefon Aksesuarları — Tüm Hakları Saklıdır.
-  <a href="/admin" class="text-gray-400 hover:text-gray-200 underline text-xs ml-2">
-    Admin Paneli
-  </a>
+<footer class="mt-16 border-t border-slate-200 bg-white/95 backdrop-blur">
+  <div class="max-w-6xl mx-auto px-4 py-10 text-sm text-slate-600">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+          📱
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900">Güllüce İletişim</p>
+          <p class="text-xs text-slate-500">Perakende telefon aksesuarları</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap gap-4 text-xs">
+        <a href="/products" class="hover:text-indigo-600">Ürünler</a>
+        <a href="/about" class="hover:text-indigo-600">Hakkımızda</a>
+        <a href="/contact" class="hover:text-indigo-600">İletişim</a>
+        <a href="/admin" class="hover:text-indigo-600">Admin Paneli</a>
+      </nav>
+    </div>
+
+    <p class="text-xs text-slate-400 mt-6">
+      © <%= new Date().getFullYear() %> Güllüce İletişim — tüm hakları saklıdır
+    </p>
+  </div>
 </footer>

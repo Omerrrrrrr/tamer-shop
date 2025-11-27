@@ -5,21 +5,55 @@
     <title>İletişim | Telefon Aksesuarları</title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
-  <body class="bg-gray-100">
+  <body class="bg-slate-50 text-slate-900">
     <%- include('partials/header') %>
 
-    <main class="max-w-3xl mx-auto py-10 px-4">
-      <h1 class="text-2xl font-bold mb-4">İletişim</h1>
-      <p class="text-gray-700 mb-4">
-        Buraya telefon, e-posta, adres gibi bilgileri sonra ekleyebilirsin.
-      </p>
+    <section class="gradient-hero border-y border-slate-200/80">
+      <div class="max-w-5xl mx-auto px-4 py-10 space-y-3">
+        <p class="soft-badge">İletişim</p>
+        <h1 class="text-3xl font-semibold">Soru veya teklif için bize yaz</h1>
+        <p class="text-sm text-slate-600 mt-2 max-w-3xl">
+          Mesaj bırakabilir veya WhatsApp hattı üzerinden ulaşabilirsin.
+        </p>
+      </div>
+    </section>
 
-      <form class="bg-white shadow rounded p-4 grid gap-3">
-        <input type="text" placeholder="Adınız" class="border rounded px-3 py-2 text-sm" />
-        <input type="email" placeholder="E-posta" class="border rounded px-3 py-2 text-sm" />
-        <textarea placeholder="Mesajınız" rows="4" class="border rounded px-3 py-2 text-sm"></textarea>
-        <button class="bg-indigo-600 text-white text-sm py-2 rounded hover:bg-indigo-700">
-          Gönder
+    <main class="max-w-5xl mx-auto py-12 px-4 grid gap-8 lg:grid-cols-[1fr,1.1fr] items-start">
+      <div class="card glass space-y-4">
+        <h2 class="text-xl font-semibold">Hızlı İletişim</h2>
+        <p class="text-sm text-slate-600">
+          tahaesmamurat@gmail.com<br/>
+          +90 542 890 41 51
+        </p>
+        <p class="text-xs text-slate-500 uppercase">Adres</p>
+        <p class="text-sm text-slate-600">
+          Yunus Emre Mah. Ziyapaşa Cad. 
+          Mf Sariyer Sitesi B blok 2C
+          Palandöken / Erzurum / Türkiye
+        </p>
+        <div class="overflow-hidden rounded-xl border border-slate-100 shadow-sm">
+          <img
+            src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80"
+            alt="Ofis haritası"
+            class="w-full h-48 object-cover" />
+        </div>
+      </div>
+
+      <form class="card glass grid gap-4">
+        <div>
+          <label class="block text-xs text-slate-500 uppercase mb-1">Ad Soyad</label>
+          <input type="text" class="input" placeholder="Ali KAYA" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 uppercase mb-1">E-posta</label>
+          <input type="email" class="input" placeholder="ornek@gmail.com" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 uppercase mb-1">Mesaj</label>
+          <textarea rows="4" class="input" placeholder="İhtiyacını veya talebini paylaş"></textarea>
+        </div>
+        <button class="btn-primary w-full justify-center">
+          Mesaj Gönder
         </button>
       </form>
     </main>

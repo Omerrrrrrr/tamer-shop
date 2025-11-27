@@ -2,58 +2,121 @@
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
-    <title>Ürün Yönetimi | Admin Panel</title>
+    <title>Ürünler | Admin</title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
-  <body class="bg-gray-100">
-    <header class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
-      <h1 class="font-bold text-lg">🔐 Admin Panel — Ürünler</h1>
-      <div class="flex items-center gap-4 text-sm">
-        <a href="/admin" class="hover:underline">Dashboard</a>
-        <a href="/admin/logout" class="bg-red-500 px-3 py-1 rounded hover:bg-red-600">
-          Çıkış Yap
-        </a>
-      </div>
-    </header>
+  <body class="bg-slate-50 text-slate-900">
+    <%- include('../partials/header') %>
 
-    <main class="max-w-6xl mx-auto py-8 px-4 grid gap-6">
-      <div class="flex justify-between items-center">
-        <h2 class="text-xl font-semibold">Ürün Listesi</h2>
-        <a
-          href="/admin/products/new"
-          class="bg-indigo-600 text-white text-sm px-4 py-2 rounded hover:bg-indigo-700">
-          + Yeni Ürün
-        </a>
+    <main class="max-w-6xl mx-auto px-4 py-10">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <p class="soft-badge">Admin</p>
+          <h1 class="text-2xl font-semibold mt-2">Ürünler</h1>
+          <p class="text-sm text-slate-500 mt-1">
+            Eklenen ürünleri görüntüleyebilir, yeni ürün ekleyebilir veya silebilirsin.
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <a
+            href="/admin/categories"
+            class="btn-secondary">
+            Kategoriler
+          </a>
+          <a
+            href="/admin/products/new"
+            class="btn-primary">
+            + Yeni Ürün
+          </a>
+        </div>
       </div>
 
-      <table class="w-full text-sm bg-white shadow rounded overflow-hidden">
-        <thead class="bg-gray-100 text-left">
-          <tr>
-            <th class="px-4 py-2">ID</th>
-            <th class="px-4 py-2">İsim</th>
-            <th class="px-4 py-2">Kategori</th>
-            <th class="px-4 py-2 text-right">İşlemler</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% products.forEach(p => { %>
-            <tr class="border-t">
-              <td class="px-4 py-2"><%= p.id %></td>
-              <td class="px-4 py-2"><%= p.name %></td>
-              <td class="px-4 py-2"><%= p.category %></td>
-              <td class="px-4 py-2 text-right">
-                <!-- Edit'i sonra yaparız -->
-                <a
-                  href="/admin/products/delete/<%= p.id %>"
-                  class="text-xs text-red-600 hover:underline"
-                  onclick="return confirm('Bu ürünü silmek istediğine emin misin?')">
-                  Sil
-                </a>
-              </td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
+      <% if (products.length === 0) { %>
+        <div class="card glass text-sm text-slate-500">
+          Henüz ürün eklenmemiş. Sağ üstten "Yeni Ürün" ekleyebilirsin.
+        </div>
+      <% } else { %>
+        <div class="card glass overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs text-slate-500 uppercase">
+                <th class="py-2 pr-4">Görsel</th>
+                <th class="py-2 pr-4">Ürün</th>
+                <th class="py-2 pr-4">Kategori</th>
+                <th class="py-2 pr-4">Stok</th>
+                <th class="py-2 pr-4">Fiyat</th>
+                <th class="py-2 pr-4">İndirim</th>
+                <th class="py-2 pr-4 text-right">İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% products.forEach(product => { %>
+                <tr class="border-t border-slate-100">
+                  <td class="py-2 pr-4 align-middle">
+                    <% if (product.image_url) { %>
+                      <div class="w-10 h-10 rounded-lg overflow-hidden bg-slate-100">
+                        <img
+                          src="<%= product.image_url %>"
+                          alt="<%= product.name %>"
+                          class="w-full h-full object-cover" />
+                      </div>
+                    <% } else { %>
+                      <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-xl">
+                        📦
+                      </div>
+                    <% } %>
+                  </td>
+                  <td class="py-2 pr-4 align-middle">
+                    <p class="font-semibold text-slate-900"><%= product.name %></p>
+                    <p class="text-xs text-slate-500 line-clamp-1">
+                      <%= product.description %>
+                    </p>
+                  </td>
+                  <td class="py-2 pr-4 align-middle text-xs text-slate-500">
+                    <%= product.category %>
+                  </td>
+                  <td class="py-2 pr-4 align-middle text-xs text-slate-500">
+                    <%= product.stock %>
+                  </td>
+                  <td class="py-2 pr-4 align-middle text-xs text-slate-900 font-semibold">
+                    ₺<%= Number(product.price || 0).toFixed(2) %>
+                  </td>
+                  <td class="py-2 pr-4 align-middle text-xs">
+                    <% if ((product.discount_percent || 0) > 0) { %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 font-semibold">
+                        -<%= product.discount_percent %>%
+                      </span>
+                    <% } else { %>
+                      <span class="text-slate-400">-</span>
+                    <% } %>
+                  </td>
+                  <td class="py-2 pr-4 align-middle text-right space-x-3">
+                    <a
+                      href="/products/<%= product.id %>"
+                      class="text-xs text-slate-500 hover:underline"
+                      target="_blank">
+                      Görüntüle
+                    </a>
+                    <a
+                      href="/admin/products/edit/<%= product.id %>"
+                      class="text-xs text-blue-600 hover:underline">
+                      Düzenle
+                    </a>
+                    <a
+                      href="/admin/products/delete/<%= product.id %>"
+                      class="text-xs text-rose-600 hover:underline"
+                      onclick="return confirm('Bu ürünü silmek istediğine emin misin?');">
+                      Sil
+                    </a>
+
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
     </main>
+    <%- include('../partials/footer') %>
   </body>
 </html>

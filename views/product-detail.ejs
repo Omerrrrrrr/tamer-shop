@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= product.name %> | Güllüce İletişim</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+
+  <style>
+    .slider-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      height: 380px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .slider-images {
+      display: flex;
+      height: 100%;
+      transition: transform 0.35s ease;
+    }
+
+    .slider-images img {
+      flex: 0 0 100%;      /* ← her slide tam genişlik */
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(15, 23, 42, 0.55);
+      border: none;
+      color: white;
+      font-size: 20px;
+      padding: 6px 11px;
+      cursor: pointer;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      transition: background 0.15s ease;
+    }
+
+    .slider-btn:hover {
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .slider-btn.prev {
+      left: 10px;
+    }
+
+    .slider-btn.next {
+      right: 10px;
+    }
+  </style>
+</head>
+  <body class="bg-slate-50 text-slate-900">
+
+  <%- include('partials/header') %>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 lg:py-12 space-y-10">
+
+    <!-- breadcrumb / geri -->
+    <div class="text-xs text-slate-400 mb-2 flex items-center gap-2">
+      <a href="/products" class="hover:text-indigo-500">Ürünler</a>
+      <span>/</span>
+      <span class="text-slate-500"><%= product.name %></span>
+    </div>
+
+    <% 
+      const fallbackImage = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80";
+      const images =
+        product.images && product.images.length
+          ? product.images
+          : (product.image_url ? [product.image_url] : []);
+      if (images.length === 0) {
+        images.push(fallbackImage);
+      }
+      const stockVal = Number(product.stock || 0);
+      const stockLabel = stockVal < 10 ? stockVal : "10+";
+    %>
+
+    <!-- ÜST KISIM: SOLDA SLIDER, SAĞDA BİLGİLER -->
+    <section class="grid gap-10 lg:grid-cols-[minmax(0,1.05fr),minmax(0,1fr)] items-start">
+
+      <!-- SOL: SLIDER -->
+      <div class="card glass relative">
+        <% if ((product.discount_percent || 0) > 0) { %>
+          <span class="absolute top-3 left-3 z-10 max-w-[80%] truncate text-xs font-semibold text-white bg-rose-600 px-3 py-1 rounded-full shadow-xl ring-2 ring-white/70 backdrop-blur-sm" style="text-shadow:0 1px 2px rgba(0,0,0,0.35);">
+            Fırsat -<%= product.discount_percent %>%
+          </span>
+        <% } %>
+        <div class="slider-wrapper">
+          <div class="slider-images" id="slider-images">
+            <% if (images.length === 0) { %>
+              <div class="flex items-center justify-center w-full h-full text-4xl bg-slate-50">
+                📦
+              </div>
+            <% } else { %>
+              <% images.forEach(img => { %>
+                <img src="<%= img %>" alt="<%= product.name %>" />
+              <% }) %>
+            <% } %>
+          </div>
+
+          <% if (images.length > 1) { %>
+            <button class="slider-btn prev" type="button" onclick="prevSlide()">‹</button>
+            <button class="slider-btn next" type="button" onclick="nextSlide()">›</button>
+          <% } %>
+        </div>
+
+            <% if (images.length > 1) { %>
+            <!-- Küçük Thumbnail'ler -->
+            <div class="flex gap-3 mt-4">
+              <% images.forEach(function (img, i) { %>
+                <div
+                  class="thumb <%= i === 0 ? 'active' : '' %>"
+                  onclick="goToSlide(<%= i %>)"
+                  id="thumb-<%= i %>"
+                  data-index="<%= i %>">
+                  <img src="<%= img %>" alt="thumb" />
+                </div>
+              <% }); %>
+            </div>
+            <% } %>
+      </div>
+
+      <!-- SAĞ: ÜRÜN BİLGİLERİ -->
+      <div class="card glass space-y-5">
+        <div class="flex flex-wrap items-center gap-2">
+          <p class="soft-badge">
+            <%= product.category || 'Kategori' %>
+          </p>
+          <span class="chip">Aynı gün kargo</span>
+        </div>
+
+        <h1 class="text-3xl lg:text-4xl font-semibold text-slate-900">
+          <%= product.name %>
+        </h1>
+
+        <p class="text-sm text-slate-600 leading-relaxed max-w-xl">
+          <%= product.description || 'Bu ürün için henüz açıklama eklenmedi.' %>
+        </p>
+
+        <div class="space-y-2">
+          <div class="flex items-center gap-3">
+            <% if ((product.discount_percent || 0) > 0) { %>
+              <span class="text-xs font-semibold text-white bg-rose-600 px-3 py-1 rounded-full shadow-lg ring-1 ring-white/60 backdrop-blur-sm" style="text-shadow:0 1px 2px rgba(0,0,0,0.35);">
+                Fırsat -<%= product.discount_percent %>%
+              </span>
+              <p class="text-sm line-through text-slate-400">
+                ₺<%= Number(product.price || 0).toFixed(2) %>
+              </p>
+            <% } %>
+            <p class="text-3xl font-bold text-white bg-slate-900 px-3 py-2 rounded-xl shadow">
+              ₺<%= Number(product.salePrice || product.price || 0).toFixed(2) %>
+            </p>
+          </div>
+          <% if ((product.discount_percent || 0) > 0) { %>
+            <div class="rounded-xl border border-amber-100 bg-amber-50 text-amber-800 text-xs px-3 py-2 inline-flex items-center gap-2">
+              <span>🔥</span>
+              <span>Bu ürün fırsatta! İndirimli fiyat sepete yansıtıldı.</span>
+            </div>
+          <% } %>
+        </div>
+
+        <p class="text-sm text-slate-500">
+          Stok durumu:
+          <span class="font-medium <%= product.stock > 0 ? 'text-emerald-600' : 'text-rose-600' %>">
+            <%= product.stock > 0 ? (stockLabel + ' adet') : 'Tükendi' %>
+          </span>
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <% if (Number(product.stock || 0) > 0 && Number(product.price || 0) > 0) { %>
+            <a
+              href="/cart/add/<%= product.id %>"
+              class="btn-primary w-full sm:w-auto">
+              Sepete Ekle
+            </a>
+          <% } else { %>
+            <button class="btn-secondary w-full sm:w-auto cursor-not-allowed text-slate-400" disabled>
+              Stokta Yok
+            </button>
+          <% } %>
+          <a
+            href="/products"
+            class="btn-secondary w-full sm:w-auto">
+            Ürünlere Geri Dön
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALT TABS: ÜRÜN BİLGİSİ / YORUMLAR -->
+    <section class="mt-10 card glass">
+      <!-- Tab başlıkları -->
+      <div class="border-b border-slate-200 flex gap-8 text-sm font-semibold">
+        <button
+          type="button"
+          class="tab-btn pb-3 border-b-2 border-indigo-500 text-indigo-600"
+          data-tab="info">
+          Ürün Bilgisi
+        </button>
+        <button
+          type="button"
+          class="tab-btn pb-3 border-b-2 border-transparent text-slate-500"
+          data-tab="reviews">
+          Yorumlar
+        </button>
+      </div>
+
+      <!-- Tab içerikleri -->
+      <div class="pt-6 space-y-6">
+        <!-- Ürün Bilgisi -->
+        <div id="tab-info" class="tab-panel">
+          <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line max-w-2xl">
+            <%= product.description || 'Bu ürün için henüz açıklama eklenmedi.' %>
+          </p>
+        </div>
+
+        <!-- Yorumlar -->
+        <div id="tab-reviews" class="tab-panel hidden space-y-4" id="comments">
+          <div class="flex items-center justify-between">
+            <p class="text-lg font-semibold text-slate-800">Yorumlar</p>
+            <% if (!currentUser) { %>
+              <a href="/auth/login" class="text-xs text-indigo-600 hover:underline">Giriş yap ve yorum yaz</a>
+            <% } %>
+          </div>
+
+          <% if (comments && comments.length) { %>
+            <div class="space-y-3">
+              <% comments.forEach(c => { %>
+                <div class="border border-slate-100 rounded-xl p-3 bg-white/80">
+                  <div class="flex items-center justify-between text-xs text-slate-500">
+                    <span><%= c.author_name %></span>
+                    <span><%= new Date(c.created_at).toLocaleString('tr-TR') %></span>
+                  </div>
+                  <p class="text-sm text-slate-800 mt-1 whitespace-pre-line"><%= c.content %></p>
+                  <% if (c.admin_reply) { %>
+                    <div class="mt-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-1">
+                      <strong>Admin:</strong> <%= c.admin_reply %>
+                    </div>
+                  <% } %>
+                  <% if (currentUser && c.user_id && c.user_id === currentUser.id) { %>
+                    <form action="/products/<%= product.id %>/comment/delete/<%= c.id %>" method="POST" class="mt-2 text-right">
+                      <button type="submit" class="text-[11px] text-rose-600 hover:underline">Yorumumu sil</button>
+                    </form>
+                  <% } %>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="text-sm text-slate-500">Bu ürün için yorum bulunmuyor.</p>
+          <% } %>
+
+          <% if (currentUser) { %>
+            <form action="/products/<%= product.id %>/comment" method="POST" class="card glass space-y-3">
+              <p class="text-sm font-semibold text-slate-800">Yorumunu ekle</p>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">Adın</label>
+                <input type="text" name="name" class="input" value="<%= currentUser.name %>" readonly />
+              </div>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">Yorumun</label>
+                <textarea name="content" rows="3" class="input" required placeholder="Ürün hakkında deneyimini paylaş"></textarea>
+              </div>
+              <button type="submit" class="btn-primary w-full justify-center">Gönder</button>
+            </form>
+          <% } else { %>
+            <div class="card glass text-sm text-slate-500">
+              Yorum yazmak için <a href="/auth/login" class="text-indigo-600 hover:underline">giriş yap</a> veya
+              <a href="/auth/register" class="text-indigo-600 hover:underline">kayıt ol</a>.
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALT: BENZER ÜRÜNLER -->
+    <% if (related && related.length) { %>
+      <section class="pt-4 border-t border-slate-200">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-slate-900">Benzer ürünler</h2>
+          <a href="/products?cat=<%= product.category %>" class="text-xs text-indigo-500 hover:text-indigo-600">
+            Bu kategorideki tüm ürünler →
+          </a>
+        </div>
+
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <% related.forEach(item => { %>
+            <a href="/products/<%= item.id %>" class="card flex flex-col hover:shadow-md transition">
+              <div class="img-frame h-32 flex items-center justify-center relative">
+                <% if ((item.discount_percent || 0) > 0) { %>
+                  <span class="absolute top-2 left-2 max-w-[80%] truncate text-[11px] font-semibold text-white bg-rose-600 px-2.5 py-1 rounded-full shadow-lg ring-1 ring-white/60 backdrop-blur-sm" style="text-shadow:0 1px 2px rgba(0,0,0,0.35);">
+                    Fırsat -<%= item.discount_percent %>%
+                  </span>
+                <% } %>
+                <% 
+                  const relImg = (item.images && item.images.length)
+                    ? item.images[0]
+                    : (item.image_url || null);
+                %>
+                <% if (relImg) { %>
+                  <img
+                    src="<%= relImg %>"
+                    alt="<%= item.name %>"
+                    class="w-full h-full object-cover"
+                  />
+                <% } else { %>
+                  <span class="text-3xl">📦</span>
+                <% } %>
+              </div>
+              <div class="mt-3 space-y-1">
+                <p class="text-xs uppercase text-slate-400"><%= item.category %></p>
+                <h3 class="font-semibold text-sm text-slate-900 line-clamp-2">
+                  <%= item.name %>
+                </h3>
+                <p class="text-xs text-indigo-600 font-semibold flex items-center gap-2">
+                  <% if ((item.discount_percent || 0) > 0) { %>
+                    <span class="text-[10px] text-white bg-gradient-to-r from-amber-500 to-rose-500 px-2 py-0.5 rounded-full shadow">
+                      Fırsat -<%= item.discount_percent %>%
+                    </span>
+                    <span class="line-through text-slate-400">
+                      ₺<%= Number(item.price || 0).toFixed(2) %>
+                    </span>
+                    <span>₺<%= Number(item.salePrice || item.price || 0).toFixed(2) %></span>
+                  <% } else { %>
+                    ₺<%= Number(item.price || 0).toFixed(2) %>
+                  <% } %>
+                </p>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      </section>
+    <% } %>
+
+  </main>
+
+  
+    <script>
+      (function () {
+        /* --- SLIDER --- */
+        const sliderImages = document.getElementById("slider-images");
+        const totalSlides = sliderImages ? sliderImages.children.length : 0;
+        let sliderIndex = 0;
+
+        function updateSlider() {
+          if (!sliderImages) return;
+          sliderImages.style.transform = "translateX(-" + (sliderIndex * 100) + "%)";
+
+          for (let i = 0; i < totalSlides; i++) {
+            const thumb = document.getElementById("thumb-" + i);
+            if (thumb) {
+              thumb.classList.remove("active");
+              if (i === sliderIndex) thumb.classList.add("active");
+            }
+          }
+        }
+
+        window.nextSlide = function () {
+          if (!totalSlides) return;
+          sliderIndex = (sliderIndex + 1) % totalSlides;
+          updateSlider();
+        };
+
+        window.prevSlide = function () {
+          if (!totalSlides) return;
+          sliderIndex = (sliderIndex - 1 + totalSlides) % totalSlides;
+          updateSlider();
+        };
+
+        window.goToSlide = function (i) {
+          if (!totalSlides) return;
+          sliderIndex = i;
+          updateSlider();
+        };
+
+        /* --- Thumbnail click (ekstra güvence) --- */
+        const thumbs = document.querySelectorAll(".thumb");
+        thumbs.forEach(function (thumb) {
+          thumb.addEventListener("click", function () {
+            const idx = Number(this.dataset.index);
+            if (!Number.isNaN(idx)) {
+              sliderIndex = idx;
+              updateSlider();
+            }
+          });
+        });
+
+        /* --- TABS: Ürün Bilgisi / Yorumlar --- */
+        const tabButtons = document.querySelectorAll(".tab-btn");
+        const tabPanels = document.querySelectorAll(".tab-panel");
+
+        function setActiveTab(name) {
+          tabButtons.forEach(function (btn) {
+            const isActive = btn.dataset.tab === name;
+            btn.classList.toggle("text-indigo-600", isActive);
+            btn.classList.toggle("border-indigo-500", isActive);
+            btn.classList.toggle("text-slate-500", !isActive);
+            btn.classList.toggle("border-transparent", !isActive);
+          });
+
+          tabPanels.forEach(function (panel) {
+            panel.classList.toggle("hidden", panel.id !== "tab-" + name);
+          });
+        }
+
+        tabButtons.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            setActiveTab(btn.dataset.tab);
+          });
+        });
+
+        // İlk açılışta slider ve tab durumu
+        updateSlider();
+        setActiveTab("info");
+      })();
+    </script>
+
+</body>
+</html>

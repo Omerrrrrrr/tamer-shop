@@ -1,0 +1,70 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.08), transparent 26%),
+      radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.08), transparent 20%),
+      linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #ecfeff 100%);
+    @apply text-slate-900 antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-100/80 shadow-lg shadow-slate-200/60 px-5 py-4 transition-transform duration-200;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-medium hover:border-indigo-200 hover:bg-indigo-50 transition;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold uppercase tracking-[0.3em];
+  }
+  
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-semibold shadow-lg shadow-indigo-200 px-4 py-2.5 text-sm transition hover:from-indigo-700 hover:to-cyan-600;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 text-slate-700 font-semibold px-4 py-2.5 text-sm transition hover:border-indigo-200 hover:text-indigo-700 bg-white/80;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 bg-white;
+  }
+
+  .soft-badge {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100;
+  }
+
+  .glass {
+    @apply bg-white/70 backdrop-blur border border-white/70 shadow-lg shadow-slate-200/50;
+  }
+
+  .gradient-hero {
+    background: linear-gradient(140deg, #eef2ff 0%, #ecfeff 40%, #ffffff 100%);
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full;
+  }
+
+  .img-frame {
+    @apply relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-cyan-50 shadow-xl shadow-slate-200 ring-1 ring-white/60;
+  }
+
+  .img-frame img {
+    @apply w-full h-full object-cover transition-transform duration-300;
+  }
+
+  .img-frame:hover img {
+    transform: scale(1.05);
+  }
+}

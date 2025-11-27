@@ -2,7 +2,7 @@
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
-    <title>Yeni Ürün | Admin</title>
+    <title>Ürün Düzenle | Admin</title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body class="bg-slate-50 text-slate-900">
@@ -10,26 +10,25 @@
 
     <main class="max-w-3xl mx-auto px-4 py-10">
       <div class="mb-6">
-        <p class="soft-badge">Admin / Ürünler</p>
-        <h1 class="text-2xl font-semibold mt-2">Yeni Ürün Ekle</h1>
+        <p class="soft-badge">Admin</p>
+        <h1 class="text-2xl font-semibold mt-2">Ürün Düzenle</h1>
         <p class="text-sm text-slate-500 mt-1">
-          Ürün bilgilerini doldurup kaydedebilirsin.
+          Ürün bilgilerini ve görsellerini güncelleyebilirsin.
         </p>
       </div>
 
-      <div class="card glass">
+      <div class="card glass p-6">
         <% if (error) { %>
-          <div class="mb-4 rounded-xl bg-rose-50 border border-rose-100 px-3 py-2 text-xs text-rose-700">
-            <%= error %>
-          </div>
+          <p class="text-sm text-rose-600 mb-4"><%= error %></p>
         <% } %>
 
-        <form method="POST" action="/admin/products" class="grid gap-4" enctype="multipart/form-data">
+        <form method="POST" action="/admin/products/edit/<%= product.id %>" class="space-y-4" enctype="multipart/form-data">
           <div>
-            <label class="block text-xs text-slate-600 mb-1">Ürün Adı *</label>
+            <label class="block text-xs text-slate-600 mb-1">Ürün Adı</label>
             <input
               type="text"
               name="name"
+              value="<%= product.name %>"
               class="input"
               required
             />
@@ -40,44 +39,47 @@
             <textarea
               name="desc"
               rows="3"
-              class="input"
-              placeholder="Kısa bir ürün açıklaması yazabilirsin"></textarea>
+              class="input"><%= product.description || '' %></textarea>
           </div>
 
-          <div class="grid gap-4 sm:grid-cols-4">
+          <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs text-slate-600 mb-1">Kategori *</label>
+              <label class="block text-xs text-slate-600 mb-1">Kategori</label>
               <select
                 name="category"
                 class="input"
-                required>
-                <option value="">Seçiniz</option>
-                <% categories.filter(c => c.id !== 'all').forEach(cat => { %>
-                  <option value="<%= cat.id %>"><%= cat.label %></option>
-                <% }) %>
+              >
+                <% categories.forEach(cat => { if (cat.id !== 'all') { %>
+                  <option value="<%= cat.id %>" <%= product.category === cat.id ? 'selected' : '' %>>
+                    <%= cat.label %>
+                  </option>
+                <% }}); %>
               </select>
             </div>
 
             <div>
-              <label class="block text-xs text-slate-600 mb-1">Stok *</label>
+              <label class="block text-xs text-slate-600 mb-1">Stok</label>
               <input
                 type="number"
                 name="stock"
-                min="0"
-                step="1"
+                value="<%= product.stock %>"
                 class="input"
+                min="0"
                 required
               />
             </div>
+          </div>
 
+          <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs text-slate-600 mb-1">Fiyat (₺) *</label>
+              <label class="block text-xs text-slate-600 mb-1">Fiyat (₺)</label>
               <input
                 type="number"
-                name="price"
-                min="0.01"
                 step="0.01"
+                name="price"
+                value="<%= product.price %>"
                 class="input"
+                min="0.01"
                 required
               />
             </div>
@@ -86,27 +88,29 @@
               <label class="block text-xs text-slate-600 mb-1">İndirim (%)</label>
               <input
                 type="number"
+                step="1"
                 name="discount"
+                value="<%= product.discount_percent || 0 %>"
+                class="input"
                 min="0"
                 max="90"
-                step="1"
-                value="0"
-                class="input"
               />
               <p class="text-[11px] text-slate-400 mt-1">İndirimli fiyat otomatik hesaplanır.</p>
             </div>
           </div>
 
           <div>
-            <label class="block text-xs text-slate-600 mb-1">Görsel URL'leri</label>
+            <label class="block text-xs text-slate-600 mb-1">
+              Görsel URL'leri (her satıra bir)
+            </label>
             <textarea
               name="imageUrls"
-              rows="3"
+              rows="4"
               class="input"
-              placeholder="Her satıra bir görsel URL yazın&#10;Örn: https://.../resim1.jpg">
-            </textarea>
+              placeholder="Her satıra bir görsel URL yazın"
+            ><%= (product.images || []).join('\n') %></textarea>
             <p class="text-[11px] text-slate-400 mt-1">
-              İstediğin kadar görsel ekleyebilirsin. İlk satır ana görsel olarak kullanılır.
+              İlk satır ana görsel olarak kullanılacaktır.
             </p>
           </div>
 
@@ -120,17 +124,18 @@
               class="input"
             />
             <p class="text-[11px] text-slate-400 mt-1">
-              Eklediğin dosyalar /uploads klasörüne kaydedilir.
+              Yüklenen dosyalar /uploads klasörüne eklenir, URL'lere eklenir.
             </p>
           </div>
 
-          <div class="flex justify-end gap-3 mt-4">
-            <a href="/admin/products" class="text-xs text-slate-500 hover:text-slate-700">
-              İptal
+          <div class="flex justify-between items-center pt-2">
+            <a href="/admin/products" class="text-xs text-slate-500 hover:underline">
+              ← Listeye dön
             </a>
             <button
               type="submit"
-              class="btn-primary">
+              class="btn-primary"
+            >
               Kaydet
             </button>
           </div>

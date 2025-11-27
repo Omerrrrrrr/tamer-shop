@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Yorumlar | Admin</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <%- include('../partials/header') %>
+
+    <main class="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="soft-badge">Admin</p>
+          <h1 class="text-2xl font-semibold mt-2">Yorumlar</h1>
+          <p class="text-sm text-slate-500">Ürün yorumlarını yanıtla veya sil.</p>
+        </div>
+      </div>
+
+      <% if (comments.length === 0) { %>
+        <div class="card glass text-sm text-slate-500">Henüz yorum yok.</div>
+      <% } else { %>
+        <div class="card glass space-y-3">
+          <% comments.forEach(comment => { %>
+            <div class="p-4 border border-slate-100 rounded-xl bg-white">
+              <div class="flex items-center justify-between text-xs text-slate-500">
+                <span>Yorum ID: <%= comment.id %></span>
+                <span>Ürün ID: <%= comment.product_id %></span>
+              </div>
+              <p class="font-semibold text-slate-900 mt-1"><%= comment.author_name %></p>
+              <p class="text-sm text-slate-700 mt-1 whitespace-pre-line"><%= comment.content %></p>
+              <% if (comment.admin_reply) { %>
+                <div class="mt-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+                  <strong>Admin:</strong> <%= comment.admin_reply %>
+                </div>
+              <% } %>
+
+              <div class="mt-3 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+                <form action="/admin/comments/update/<%= comment.id %>" method="POST" class="flex-1 flex gap-2">
+                  <input
+                    type="text"
+                    name="content"
+                    placeholder="Yorumu düzenle"
+                    class="input"
+                    value="<%= comment.content %>"
+                  />
+                  <button type="submit" class="btn-secondary">Yorumu Kaydet</button>
+                </form>
+                <form action="/admin/comments/reply/<%= comment.id %>" method="POST" class="flex items-center gap-2">
+                  <input
+                    type="text"
+                    name="reply"
+                    placeholder="Admin cevabı"
+                    class="input"
+                    value="<%= comment.admin_reply || '' %>"
+                  />
+                  <button type="submit" class="btn-secondary">Cevabı Kaydet</button>
+                </form>
+                <form action="/admin/comments/delete/<%= comment.id %>" method="POST" onsubmit="return confirm('Bu yorumu silmek istiyor musun?');">
+                  <button type="submit" class="text-xs text-rose-600 hover:underline">Sil</button>
+                </form>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </main>
+    <%- include('../partials/footer') %>
+  </body>
+</html>

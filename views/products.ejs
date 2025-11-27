@@ -5,37 +5,165 @@
     <title>Ürünler | Telefon Aksesuarları</title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
-  <body class="bg-gray-100">
+  <body class="bg-slate-50 text-slate-900">
     <%- include('partials/header') %>
 
-    <main class="max-w-6xl mx-auto py-10 px-4">
-      <h1 class="text-2xl font-bold mb-6">Tüm Ürünler</h1>
+    <%
+      const productsPageCategories = Array.isArray(categories) ? categories : [];
+      const productCategoryIcons = {
+        all: "✨",
+        kilif: "📱",
+        cam: "🛡️",
+        sarf: "🔌",
+        powerbank: "🔋",
+      };
+      const fallbackImage = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80";
+    %>
 
-      <!-- Kategori filtresi -->
-      <div class="flex flex-wrap gap-2 mb-8">
-        <% categories.forEach(cat => { %>
-          <a
-            href="/products?<%= cat.id === 'all' ? '' : 'cat=' + cat.id %>"
-            class="px-4 py-2 rounded-full text-sm border
-                   <%= activeCategory === cat.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 hover:bg-gray-100' %>">
-            <%= cat.label %>
-          </a>
-        <% }) %>
+    <section class="gradient-hero border-b border-slate-200/80">
+      <div class="max-w-6xl mx-auto px-4 py-10 flex flex-col gap-3">
+        <div class="flex items-center gap-3">
+          <p class="soft-badge">Alışveriş vitrinı</p>
+          <% if (searchTerm) { %>
+            <span class="chip">"<%= searchTerm %>"</span>
+          <% } %>
+        </div>
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 class="text-3xl md:text-4xl font-semibold mb-2">Tüm ürünler</h1>
+            <p class="text-sm text-slate-600 max-w-3xl">
+              Kategori ve arama filtrelerini kullanarak kendine en uygun aksesuarları kolayca bul.
+            </p>
+          </div>
+          <a href="/products" class="btn-secondary">Filtreleri sıfırla</a>
+        </div>
       </div>
+    </section>
 
-      <!-- Ürün grid -->
-      <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <% products.forEach(product => { %>
-          <article class="bg-white rounded-lg shadow p-4 flex flex-col">
-            <div class="bg-gray-200 rounded mb-3 aspect-[4/3]"></div>
-            <h2 class="font-semibold mb-1"><%= product.name %></h2>
-            <p class="text-sm text-gray-500 mb-3"><%= product.desc %></p>
-            <button
-              class="mt-auto bg-indigo-600 text-white text-sm py-2 rounded hover:bg-indigo-700">
-              Sepete Ekle
-            </button>
-          </article>
-        <% }) %>
+    <main class="max-w-6xl mx-auto py-10 px-4">
+      <div class="grid gap-6 lg:grid-cols-[300px,1fr]">
+        <aside class="card glass h-fit">
+          <p class="section-label text-indigo-500 mb-3">Kategoriler</p>
+          <div class="space-y-2">
+            <% productsPageCategories.forEach(cat => { %>
+              <a
+                href="<%= cat.id === 'all' ? '/products' : '/products?cat=' + cat.id %>"
+                class="flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm
+                  <%= activeCategory === cat.id
+                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                    : 'bg-white text-slate-600 border-slate-100 hover:border-slate-200' %>">
+                <span><%= cat.label %></span>
+                <span class="text-xs text-slate-400"><%= cat.id === activeCategory ? '•' : '' %></span>
+              </a>
+            <% }) %>
+          </div>
+        </aside>
+
+        <section class="card glass">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <% if (searchTerm) { %>
+              <p class="text-sm text-slate-500">
+                "<span class="font-semibold text-slate-700"><%= searchTerm %></span>" için
+                <%= products.length %> sonuç bulundu.
+              </p>
+            <% } else { %>
+              <p class="text-sm text-slate-500">
+                Seçilen filtrelere göre <%= products.length %> ürün görüntüleniyor.
+              </p>
+            <% } %>
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <span class="chip">Filtreyi daraltmak için aramayı kullan</span>
+            </div>
+          </div>
+
+          <% if (products.length === 0) { %>
+            <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-500">
+              <% if (searchTerm) { %>
+                "<strong><%= searchTerm %></strong>" için eşleşen ürün bulunamadı. Arama kelimesini
+                değiştirip tekrar deneyebilir veya diğer kategorilere göz atabilirsin.
+              <% } else if (activeCategory !== 'all') { %>
+                Bu kategori için henüz ürün eklenmemiş gibi görünüyor.
+              <% } else { %>
+                Ürün listesi şu an boş. Admin panelinden ürün ekleyebilirsin.
+              <% } %>
+            </div>
+          <% } else { %>
+            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <% products.forEach(product => { %>
+                <article class="card flex flex-col hover:-translate-y-1 transition">
+                  <div class="img-frame group h-32 text-4xl flex items-center justify-center">
+                    <% if ((product.discount_percent || 0) > 0) { %>
+                      <span class="absolute top-2 left-2 max-w-[80%] truncate text-[11px] font-semibold text-white bg-rose-600 px-2.5 py-1 rounded-full shadow-xl ring-2 ring-white/70 backdrop-blur-sm" style="text-shadow:0 1px 2px rgba(0,0,0,0.35);">
+                        Fırsat -<%= product.discount_percent %>%
+                      </span>
+                    <% } %>
+                    <% if (product.image_url) { %>
+                      <img
+                        src="<%= product.image_url %>"
+                        alt="<%= product.name %>"
+                        class="w-full h-full object-cover" />
+                    <% } else { %>
+                      <div class="w-full h-full flex items-center justify-center text-4xl text-slate-400">
+                        📦
+                      </div>
+                    <% } %>
+                  </div>
+                  <p class="text-xs text-slate-500 mt-3"><%= product.category %></p>
+                  <h2 class="text-lg font-semibold mt-1">
+                    <a href="/products/<%= product.id %>" class="hover:text-indigo-600">
+                      <%= product.name %>
+                    </a>
+                  </h2>
+                  <p class="text-sm text-slate-500 mt-1 flex-1"><%= product.description %></p>
+
+                  <p class="text-sm font-semibold text-slate-900 mt-2 flex items-center gap-2">
+                    <% if ((product.discount_percent || 0) > 0) { %>
+                      <span class="text-[11px] text-white font-semibold bg-rose-600 px-2.5 py-1 rounded-full shadow-lg ring-1 ring-white/60 backdrop-blur-sm max-w-[70%] truncate" style="text-shadow:0 1px 2px rgba(0,0,0,0.35);">
+                        Fırsat -<%= product.discount_percent %>%
+                      </span>
+                      <span class="line-through text-slate-400 text-xs">
+                        ₺<%= Number(product.price || 0).toFixed(2) %>
+                      </span>
+                      <span class="px-2 py-1 rounded-lg bg-slate-900 text-white shadow">
+                        ₺<%= Number(product.salePrice || product.price || 0).toFixed(2) %>
+                      </span>
+                    <% } else { %>
+                      ₺<%= Number(product.price || 0).toFixed(2) %>
+                    <% } %>
+                  </p>
+
+                  <p class="text-xs text-slate-400 mb-4">
+                    <% const stockVal = Number(product.stock || 0); %>
+                    <% if (stockVal <= 0) { %>
+                      Tükendi
+                    <% } else { %>
+                      Stokta: <%= stockVal < 10 ? stockVal : '10+' %> adet
+                    <% } %>
+                  </p>
+                  <div class="flex gap-2 mt-auto">
+                    <% if (Number(product.stock || 0) > 0 && Number(product.price || 0) > 0) { %>
+                      <a
+                        href="/cart/add/<%= product.id %>"
+                        class="flex-1 text-center bg-indigo-600 text-white text-sm font-semibold py-2 rounded-xl hover:bg-indigo-700 transition">
+                        Sepete Ekle
+                      </a>
+                    <% } else { %>
+                      <button
+                        class="flex-1 text-center bg-slate-200 text-slate-500 text-sm font-semibold py-2 rounded-xl cursor-not-allowed">
+                        Stokta Yok
+                      </button>
+                    <% } %>
+                    <a
+                      href="<%= product.category === 'all' ? '/products' : '/products?cat=' + product.category %>"
+                      class="px-4 py-2 rounded-xl border border-slate-200 text-sm text-slate-600 hover:border-indigo-200">
+                      Kategori
+                    </a>
+                  </div>
+                </article>
+              <% }) %>
+            </div>
+          <% } %>
+        </section>
       </div>
     </main>
 

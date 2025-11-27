@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kart ile Ödeme | Güllüce İletişim</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <%- include('partials/header') %>
+
+    <section class="gradient-hero border-y border-slate-200/80">
+      <div class="max-w-5xl mx-auto px-4 py-8 space-y-2">
+        <p class="soft-badge">Kart ile ödeme</p>
+        <h1 class="text-3xl font-semibold">Siparişini tamamla</h1>
+        <p class="text-sm text-slate-600">Güvenli form ile kart bilgilerini gir, siparişin oluşturulsun.</p>
+      </div>
+    </section>
+
+    <main class="max-w-5xl mx-auto px-4 py-10 grid gap-8 lg:grid-cols-[1.1fr,0.9fr] items-start">
+      <section class="card glass">
+        <h2 class="text-lg font-semibold mb-2">Kart bilgileri</h2>
+        <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 text-sm px-3 py-2">
+          Bu ödeme ekranı demo amaçlıdır. Kart veriniz saklanmaz; canlı kullanıma geçmeden önce gerçek ödeme altyapısı ve HTTPS kullanın.
+        </div>
+
+        <% if (error) { %>
+          <div class="mb-3 text-sm text-rose-600 bg-rose-50 border border-rose-100 rounded-lg px-3 py-2">
+            <p><%= error %></p>
+            <% if (errorList && errorList.length) { %>
+              <ul class="list-disc pl-5 text-rose-700 mt-2 space-y-1">
+                <% errorList.forEach(e => { %>
+                  <li><%= e %></li>
+                <% }) %>
+              </ul>
+            <% } %>
+          </div>
+        <% } %>
+        <% if (success) { %>
+          <p class="mb-3 text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2"><%= success %></p>
+        <% } %>
+
+        <form method="POST" action="/checkout" class="grid gap-4">
+          <div>
+            <label class="block text-sm text-slate-700 mb-1">Kart üzerindeki isim</label>
+            <input
+              type="text"
+              name="name"
+              value="<%= form?.name || '' %>"
+              class="input"
+              placeholder="Ad Soyad"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm text-slate-700 mb-1">E-posta (opsiyonel)</label>
+            <input
+              type="email"
+              name="email"
+              value="<%= form?.email || '' %>"
+              class="input"
+              placeholder="mail@ornek.com"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm text-slate-700 mb-1">Kart numarası</label>
+            <input
+              type="text"
+              name="cardNumber"
+              value="<%= form?.cardNumber || '' %>"
+              class="input"
+              placeholder="0000 0000 0000 0000"
+              inputmode="numeric"
+              maxlength="19"
+              required
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-slate-700 mb-1">SKT (AA/YY)</label>
+              <input
+                type="text"
+                name="exp"
+                value="<%= form?.exp || '' %>"
+                class="input"
+                placeholder="12/26"
+                maxlength="5"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-slate-700 mb-1">CVC</label>
+              <input
+                type="text"
+                name="cvc"
+                value="<%= form?.cvc || '' %>"
+                class="input"
+                placeholder="123"
+                maxlength="4"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary w-full justify-center">Kartla Öde</button>
+          <p class="text-xs text-slate-400">Bu form demo amaçlıdır, kart bilgileriniz kaydedilmez.</p>
+        </form>
+      </section>
+
+      <section class="card glass">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold">Sipariş Özeti</h2>
+          <span class="text-xs text-slate-500"><%= totals?.totalItems || 0 %> ürün</span>
+        </div>
+        <% if (!cart || cart.length === 0) { %>
+          <p class="text-sm text-slate-500">Sepetin boş. Ürün ekledikten sonra ödeyebilirsin.</p>
+        <% } else { %>
+          <div class="divide-y divide-slate-100">
+            <% cart.forEach(item => { %>
+              <div class="py-3 flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-semibold text-slate-900"><%= item.name %></p>
+                  <p class="text-xs text-slate-500">Adet: <%= item.qty %></p>
+                </div>
+                <div class="text-right text-sm">
+                  <% if ((item.discountPercent || 0) > 0 && item.originalPrice) { %>
+                    <p class="line-through text-slate-400 text-xs">₺<%= Number(item.originalPrice || 0).toFixed(2) %></p>
+                    <p class="text-emerald-600 font-semibold">₺<%= Number(item.price || 0).toFixed(2) %></p>
+                  <% } else { %>
+                    <p class="font-semibold text-slate-900">₺<%= Number(item.price || 0).toFixed(2) %></p>
+                  <% } %>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <div class="mt-4 space-y-2 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Ara toplam</span>
+              <span class="font-semibold">₺<%= (totals?.totalAmount || 0).toFixed(2) %></span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Kargo</span>
+              <span class="font-semibold"><%= (totals?.shipping || 0) === 0 ? 'Ücretsiz' : '₺' + (totals?.shipping || 0).toFixed(2) %></span>
+            </div>
+            <div class="flex items-center justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
+              <span>Ödenecek</span>
+              <span>₺<%= (totals?.payable || 0).toFixed(2) %></span>
+            </div>
+          </div>
+        <% } %>
+      </section>
+    </main>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>
