@@ -2,7 +2,7 @@
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
-    <title>Telefon Aksesuarları</title>
+    <title><%= t('brand_name','Güllüce Communication') %></title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body class="bg-slate-50 text-slate-900">
@@ -22,35 +22,35 @@
     <section class="gradient-hero border-b border-slate-200/80">
       <div class="max-w-6xl mx-auto px-4 py-12 grid gap-10 md:grid-cols-[1.1fr,0.9fr] items-center">
         <div class="space-y-5">
-          <p class="soft-badge">Yeni sezon aksesuar · Hızlı teslimat</p>
+          <p class="soft-badge"><%= t('hero_badge','New season accessories · Fast delivery') %></p>
           <h1 class="text-4xl md:text-5xl font-semibold leading-tight text-slate-900">
-            Tarzını yansıtan aksesuarları seç, kapına hızlı gelsin.
+            <%= t('hero_title','Pick accessories that reflect your style, delivered fast.') %>
           </h1>
           <p class="text-sm text-slate-600 max-w-xl">
-            Güncel stok, kaliteli görseller ve tek tıkla sipariş akışı. Kılıf, cam, şarj ve powerbank seçeneklerini kolayca karşılaştır ve sepetine ekle.
+            <%= t('hero_desc','Fresh stock, quality visuals and one-click ordering. Compare cases, glass, chargers and powerbanks easily and add to cart.') %>
           </p>
           <div class="flex flex-wrap gap-3">
-            <a href="/products" class="btn-primary">Ürünleri Gör</a>
-            <a href="https://wa.me/+905428904151" target="_blank" class="btn-secondary">Satış Ekibi</a>
+            <a href="/products" class="btn-primary"><%= t('hero_cta_primary','See Products') %></a>
+            <a href="https://wa.me/+905428904151" target="_blank" class="btn-secondary"><%= t('hero_cta_secondary','Sales Team') %></a>
           </div>
           <dl class="grid grid-cols-3 gap-4 text-sm text-slate-600">
             <div class="card glass">
-              <dt class="text-xs text-slate-500 uppercase">Ürün</dt>
+              <dt class="text-xs text-slate-500 uppercase"><%= t('stats_products','Products') %></dt>
               <dd class="text-2xl font-semibold text-slate-900"><%= totalProducts %>+</dd>
             </div>
             <div class="card glass">
-              <dt class="text-xs text-slate-500 uppercase">Kategori</dt>
+              <dt class="text-xs text-slate-500 uppercase"><%= t('stats_categories','Categories') %></dt>
               <dd class="text-2xl font-semibold text-slate-900"><%= totalCategories %></dd>
             </div>
             <div class="card glass">
-              <dt class="text-xs text-slate-500 uppercase">Stok</dt>
+              <dt class="text-xs text-slate-500 uppercase"><%= t('stats_stock','Stock') %></dt>
               <dd class="text-2xl font-semibold text-slate-900"><%= totalStock %>+</dd>
             </div>
           </dl>
           <div class="flex flex-wrap gap-2 text-xs text-slate-500">
-            <span class="chip">HD ürün görselleri</span>
-            <span class="chip">Hızlı sevkiyat</span>
-            <span class="chip">Kolay iade</span>
+            <span class="chip"><%= t('chip_quality','HD product visuals') %></span>
+            <span class="chip"><%= t('chip_speed','Fast shipping') %></span>
+            <span class="chip"><%= t('chip_return','Easy returns') %></span>
           </div>
         </div>
 
@@ -59,8 +59,8 @@
           <div class="absolute -bottom-12 -left-6 w-48 h-48 rounded-full bg-cyan-200 blur-3xl opacity-70"></div>
           <div class="relative z-10 space-y-4">
             <div class="flex items-center justify-between">
-              <p class="section-label text-indigo-500">Öne çıkan kategoriler</p>
-              <span class="text-xs text-slate-500">16:00 öncesi aynı gün hazırlık</span>
+              <p class="section-label text-indigo-500"><%= t('featured_categories','Featured categories') %></p>
+              <span class="text-xs text-slate-500"><%= lang === 'tr' ? "16:00 öncesi aynı gün hazırlık" : "Orders before 16:00 prepared same day" %></span>
             </div>
             <div class="grid gap-3">
               <% featuredCats.forEach(cat => { %>
@@ -98,10 +98,10 @@
     <section class="max-w-6xl mx-auto px-4 py-10 space-y-6">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p class="section-label text-indigo-500">Kategoriler</p>
-          <h2 class="text-2xl font-semibold mt-1">İhtiyacını saniyeler içinde bul</h2>
+          <p class="section-label text-indigo-500"><%= t('categories_title','Categories') %></p>
+          <h2 class="text-2xl font-semibold mt-1"><%= t('categories_sub','Find what you need in seconds') %></h2>
         </div>
-        <a href="/products" class="text-sm text-indigo-600 hover:underline">Tüm ürünleri gör</a>
+        <a href="/products" class="text-sm text-indigo-600 hover:underline"><%= t('view_all_products','See all products') %></a>
       </div>
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <% homeCategories.forEach(cat => { %>
@@ -118,7 +118,9 @@
             <div>
               <p class="font-semibold text-slate-900"><%= cat.label %></p>
               <p class="text-xs text-slate-500">
-                <%= cat.id === 'all' ? 'Tüm katalog' : 'Kategori vitrinine göz at' %>
+                <%= cat.id === 'all'
+                  ? t('category_all_hint','Entire catalog')
+                  : t('category_hint','Browse the category') %>
               </p>
             </div>
           </a>
@@ -157,8 +159,8 @@
                 </div>
               <% } %>
             </div>
-            <p class="text-xs text-slate-500 mt-3">
-              <%= categoryLabels[product.category] || 'Ürün' %>
+          <p class="text-xs text-slate-500 mt-3">
+              <%= categoryLabels[product.category] || t('nav_products','Products') %>
             </p>
             <h3 class="text-lg font-semibold mt-1">
               <a href="/products/<%= product.id %>" class="hover:text-indigo-600">

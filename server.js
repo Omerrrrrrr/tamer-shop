@@ -8,6 +8,7 @@ const multer = require("multer");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cors = require("cors");
+const { translate } = require("./locales");
 const shopRouter = require("./routes/shop");
 const authRouter = require("./routes/auth");
 const adminRouter = require("./routes/admin");
@@ -153,8 +154,18 @@ app.use(
 /* ---- Tüm view'lara ortak değişkenler ---- */
 
 app.use((req, res, next) => {
+  const queryLang = req.query.lang;
+  if (queryLang === "tr" || queryLang === "en") {
+    req.session.lang = queryLang;
+  }
+  const lang = req.session.lang || "tr";
+  const targetLang = lang === "tr" ? "en" : "tr";
+  const params = new URLSearchParams(req.query);
+  params.set("lang", targetLang);
+  const toggleLink = req.path + "?" + params.toString();
+
   const baseCategories = getAllCategories();
-  const categories = [{ id: "all", label: "Tümü" }, ...baseCategories];
+  const categories = [{ id: "all", label: translate(lang, "nav_products", "Products") }, ...baseCategories];
 
   const cart = req.session?.cart || [];
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -164,6 +175,9 @@ app.use((req, res, next) => {
   // Oturum açmış alıcı bilgisi
   res.locals.currentUser = req.session?.user || null;
   res.locals.isAdmin = !!req.session?.isAdmin;
+  res.locals.lang = lang;
+  res.locals.langToggleLink = toggleLink;
+  res.locals.t = (key, fallback) => translate(lang, key, fallback);
   res.locals.categories = categories;
   res.locals.baseCategories = baseCategories;
   req.categories = baseCategories;

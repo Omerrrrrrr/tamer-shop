@@ -2,7 +2,7 @@
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
-    <title>Sepet | Telefon Aksesuarları</title>
+    <title><%= t('nav_cart','Cart') %> | <%= t('brand_name','Güllüce Communication') %></title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body class="bg-slate-50 text-slate-900">
@@ -11,10 +11,10 @@
 
     <section class="gradient-hero border-y border-slate-200/80">
       <div class="max-w-4xl mx-auto px-4 py-8 space-y-3">
-        <p class="soft-badge">Sepet</p>
-        <h1 class="text-3xl font-semibold">Siparişe hazır ürünlerin</h1>
+        <p class="soft-badge"><%= t('nav_cart','Cart') %></p>
+        <h1 class="text-3xl font-semibold"><%= t('cart_title','Your items ready to order') %></h1>
         <p class="text-sm text-slate-600 max-w-2xl">
-          Ürünleri düzenleyebilir ve alışverişe devam edebilirsin. Görseller yüksek çözünürlükte saklanır.
+          <%= t('cart_desc','You can adjust items and continue shopping.') %>
         </p>
       </div>
     </section>
@@ -30,14 +30,14 @@
 
       <% if (cart.length === 0) { %>
         <div class="card glass text-center">
-          <p class="text-lg font-semibold text-slate-800 mb-3">Sepetin boş</p>
+          <p class="text-lg font-semibold text-slate-800 mb-3"><%= t('cart_empty','Your cart is empty') %></p>
           <p class="text-sm text-slate-500 mb-6">
-            Ürünleri eklemek için katalogdan favorilerini seçebilir veya trend listemize göz atabilirsin.
+            <%= t('cart_empty_desc','Pick your favorites from the catalog or check our trending list.') %>
           </p>
           <a
             href="/products"
             class="btn-primary">
-            Ürünlere Git
+            <%= t('cart_continue','Go to Products') %>
           </a>
         </div>
       <% } else { %>
@@ -56,9 +56,9 @@
                     </a>
                   </div>
                   <div>
-                  <p class="text-base font-semibold"><a href="/products/<%= item.id %>" class="hover:text-indigo-600"><%= item.name %></a></p>
+                    <p class="text-base font-semibold"><a href="/products/<%= item.id %>" class="hover:text-indigo-600"><%= item.name %></a></p>
                   <p class="text-xs text-slate-500 mt-1">
-                    Adet: <%= item.qty %>
+                    Qty: <%= item.qty %>
                   </p>
                   <% if ((item.discountPercent || 0) > 0 && item.originalPrice) { %>
                     <div class="text-xs text-slate-500 mt-1">
@@ -68,14 +68,14 @@
                     <% } else { %>
                     <p class="text-xs text-slate-500 mt-1">Birim fiyat: ₺<%= Number(item.price || 0).toFixed(2) %></p>
                     <% } %>
-                  <p class="text-xs text-slate-700 mt-1 font-semibold">
-                    Toplam (indirimli): ₺<%= (Number(item.price || 0) * item.qty).toFixed(2) %>
+                    <p class="text-xs text-slate-700 mt-1 font-semibold">
+                    Total: ₺<%= (Number(item.price || 0) * item.qty).toFixed(2) %>
                   </p>
                 </div>
                 </div>
                 <div class="flex items-center gap-3">
                   <form action="/cart/update/<%= item.id %>" method="POST" class="flex items-center gap-2" oninput="this.submit()">
-                    <label for="qty-<%= item.id %>" class="sr-only">Adet</label>
+                    <label for="qty-<%= item.id %>" class="sr-only">Quantity</label>
                     <input
                       id="qty-<%= item.id %>"
                       name="qty"
@@ -84,12 +84,12 @@
                       value="<%= item.qty %>"
                       class="w-16 rounded-lg border border-slate-200 px-2 py-1 text-sm"
                     />
-                    <button type="submit" class="text-xs text-indigo-600 font-semibold hover:underline">Güncelle</button>
+                    <button type="submit" class="text-xs text-indigo-600 font-semibold hover:underline">Update</button>
                   </form>
                   <a
                     href="/cart/remove/<%= item.id %>"
                     class="text-xs text-rose-600 hover:underline">
-                    Kaldır
+                    Remove
                   </a>
                 </div>
               </div>
@@ -97,34 +97,34 @@
           </div>
 
           <div class="card glass h-fit">
-            <p class="section-label text-slate-500 mb-3">Özet</p>
+            <p class="section-label text-slate-500 mb-3"><%= t('cart_summary','Summary') %></p>
 
             <div class="flex items-center justify-between mb-2">
-              <span class="text-sm text-slate-500">Toplam ürün</span>
+              <span class="text-sm text-slate-500"><%= t('cart_total_items','Total items') %></span>
               <span class="text-base font-semibold"><%= totalItems %></span>
             </div>
 
             <div class="flex items-center justify-between mb-4">
-              <span class="text-sm text-slate-500">Toplam tutar</span>
+              <span class="text-sm text-slate-500"><%= t('cart_total_amount','Total amount') %></span>
               <span class="text-base font-semibold">
                 ₺<%= totalAmount.toFixed(2) %>
               </span>
             </div>
 
             <p class="text-xs text-slate-400 mb-6">
-              Fiyatlar bilgilendirme amaçlıdır, nihai koşullar satış temsilcisi ile netleşir.
+              <%= t('cart_shipping_notice','Prices are indicative; final terms are agreed with the sales rep.') %>
             </p>
 
             <div class="flex flex-col gap-2">
               <a
                 href="/checkout"
                 class="btn-primary w-full justify-center">
-                Kartla Öde
+                <%= t('cart_pay','Pay by Card') %>
               </a>
               <a
                 href="/products"
                 class="btn-secondary w-full justify-center">
-                Alışverişe Devam Et
+                <%= t('cart_keep_shopping','Continue Shopping') %>
               </a>
             </div>
           </div>
